@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chalo Khelein - Free Online Mini Games</title>
+  <meta name="description" content="Play free mini games online on Chalo Khelein. Puzzle, arcade, memory, sports and casual games." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="site-shell">
+    <header class="top-header">
+      <a class="logo" href="#" onclick="showHome();return false;">
+        <span class="logo-mark">CK</span>
+        <span class="logo-copy">
+          <strong>Chalo Khelein</strong>
+          <small>Play • Enjoy • Repeat</small>
+        </span>
+      </a>
+
+      <nav class="main-nav">
+        <a href="#" class="active" onclick="showHome();return false;">Home</a>
+        <a href="#allGames">All Games</a>
+        <a href="#categories">Categories</a>
+        <a href="#trending">Trending</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="icon-button" title="Scores" onclick="showScoreBoard()">🏆</button>
+        <button class="profile-button">
+          <span class="profile-avatar">G</span>
+          <span>Guest Player</span>
+        </button>
+      </div>
+    </header>
+
+    <main id="homeScreen">
+      <section class="hero-section">
+        <div class="hero-content">
+          <span class="hero-badge">🎮 100% Free Online Games</span>
+          <h1>Let’s Play.<br><span>Chalo Khelein!</span></h1>
+          <p>Play quick, fun and exciting mini games directly in your browser. No download, no login, just pure entertainment.</p>
+          <div class="hero-actions">
+            <button class="primary-button" onclick="openGame('tictactoe')">Play Featured Game</button>
+            <a class="secondary-button" href="#allGames">Explore All Games</a>
+          </div>
+          <div class="hero-stats">
+            <div><strong>8+</strong><span>Mini Games</span></div>
+            <div><strong>5</strong><span>Categories</span></div>
+            <div><strong>Free</strong><span>Forever</span></div>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="floating-card card-one">🏎️</div>
+          <div class="floating-card card-two">🧩</div>
+          <div class="floating-card card-three">⚽</div>
+          <div class="console">
+            <div class="console-screen">
+              <span>CHALO</span>
+              <strong>KHELEIN</strong>
+              <small>PRESS PLAY</small>
+            </div>
+            <div class="console-controls">
+              <div class="dpad">✚</div>
+              <div class="console-buttons"><i></i><i></i></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="search-strip">
+        <div class="search-box">
+          <span>🔎</span>
+          <input id="gameSearch" type="text" placeholder="Search your favourite game..." oninput="filterGames()" />
+        </div>
+        <div class="quick-tags">
+          <button onclick="filterByCategory('all')" class="active">All</button>
+          <button onclick="filterByCategory('puzzle')">Puzzle</button>
+          <button onclick="filterByCategory('arcade')">Arcade</button>
+          <button onclick="filterByCategory('sports')">Sports</button>
+          <button onclick="filterByCategory('casual')">Casual</button>
+        </div>
+      </section>
+
+      <section class="section-block" id="trending">
+        <div class="section-title">
+          <div>
+            <span class="eyebrow">HOT RIGHT NOW</span>
+            <h2>Trending Games</h2>
+          </div>
+          <a href="#allGames">View All Games →</a>
+        </div>
+
+        <div class="featured-grid">
+          <article class="featured-game featured-main" onclick="openGame('tictactoe')">
+            <div class="featured-overlay">
+              <span class="pill">Featured</span>
+              <h3>Tic-Tac-Toe Master</h3>
+              <p>Challenge the computer and prove your strategy skills.</p>
+              <button>Play Now</button>
+            </div>
+            <div class="featured-art">❌⭕</div>
+          </article>
+
+          <article class="featured-game feature-small purple" onclick="openGame('memory')">
+            <span class="pill">Popular</span>
+            <div class="mini-feature-art">🧠</div>
+            <div>
+              <h3>Memory Match</h3>
+              <p>Find all matching pairs.</p>
+            </div>
+          </article>
+
+          <article class="featured-game feature-small orange" onclick="openGame('tap')">
+            <span class="pill">Fast</span>
+            <div class="mini-feature-art">⚡</div>
+            <div>
+              <h3>Tap Challenge</h3>
+              <p>Tap as fast as you can.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-block" id="categories">
+        <div class="section-title">
+          <div>
+            <span class="eyebrow">CHOOSE YOUR STYLE</span>
+            <h2>Game Categories</h2>
+          </div>
+        </div>
+
+        <div class="category-grid">
+          <button class="category-card" onclick="filterByCategory('puzzle')">
+            <span>🧩</span><strong>Puzzle</strong><small>3 Games</small>
+          </button>
+          <button class="category-card" onclick="filterByCategory('arcade')">
+            <span>👾</span><strong>Arcade</strong><small>2 Games</small>
+          </button>
+          <button class="category-card" onclick="filterByCategory('sports')">
+            <span>⚽</span><strong>Sports</strong><small>1 Game</small>
+          </button>
+          <button class="category-card" onclick="filterByCategory('casual')">
+            <span>🎯</span><strong>Casual</strong><small>2 Games</small>
+          </button>
+          <button class="category-card" onclick="filterByCategory('kids')">
+            <span>🌈</span><strong>Kids</strong><small>2 Games</small>
+          </button>
+        </div>
+      </section>
+
+      <section class="section-block" id="allGames">
+        <div class="section-title">
+          <div>
+            <span class="eyebrow">GAME LIBRARY</span>
+            <h2>All Mini Games</h2>
+          </div>
+          <span id="resultCount" class="result-count">8 Games</span>
+        </div>
+
+        <div class="games-grid" id="gamesGrid">
+          <article class="game-card" data-category="puzzle" data-name="tic tac toe strategy">
+            <div class="game-thumb thumb-red"><span>❌⭕</span><b>Strategy</b></div>
+            <div class="game-info">
+              <div><h3>Tic-Tac-Toe</h3><p>Classic 3×3 strategy game.</p></div>
+              <button onclick="openGame('tictactoe')">Play</button>
+            </div>
+          </article>
+
+          <article class="game-card" data-category="puzzle kids" data-name="memory match brain puzzle">
+            <div class="game-thumb thumb-purple"><span>🧠</span><b>Memory</b></div>
+            <div class="game-info">
+              <div><h3>Memory Match</h3><p>Match all emoji pairs.</p></div>
+              <button onclick="openGame('memory')">Play</button>
+            </div>
+          </article>
+
+          <article class="game-card" data-category="arcade casual" data-name="tap challenge speed">
+            <div class="game-thumb thumb-orange"><span>⚡</span><b>Speed</b></div>
+            <div class="game-info">
+              <div><h3>Tap Challenge</h3><p>Test your tapping speed.</p></div>
+              <button onclick="openGame('tap')">Play</button>
+            </div>
+          </article>
+
+          <article class="game-card" data-category="puzzle casual" data-name="number guess logic">
+            <div class="game-thumb thumb-green"><span>🔢</span><b>Logic</b></div>
+            <div class="game-info">
+              <div><h3>Number Guess</h3><p>Guess the hidden number.</p></div>
+              <button onclick="openGame('guess')">Play</button>
+            </div>
+          </article>
+
+          <article class="game-card" data-category="arcade" data-name="snake arcade">
+            <div class="game-thumb thumb-blue"><span>🐍</span><b>Arcade</b></div>
+            <div class="game-info">
+              <div><h3>Snake Mini</h3><p>Eat food and grow longer.</p></div>
+              <button onclick="openGame('snake')">Play</button>
+            </div>
+          </article>
+
+          <article class="game-card" data-category="sports kids" data-name="penalty kick football">
+            <div class="game-thumb thumb-cyan"><span>⚽</span><b>Sports</b></div>
+            <div class="game-info">
+              <div><h3>Penalty Kick</h3><p>Score as many goals as possible.</p></div>
+              <button onclick="openGame('penalty')">Play</button>
+            </div>
+          </article>
+
+          <article class="game-card" data-category="casual kids" data-name="color catcher">
+            <div class="game-thumb thumb-pink"><span>🎨</span><b>Casual</b></div>
+            <div class="game-info">
+              <div><h3>Color Catch</h3><p>Click the correct color.</p></div>
+              <button onclick="openGame('color')">Play</button>
+            </div>
+          </article>
+
+          <article class="game-card" data-category="puzzle" data-name="quick math puzzle">
+            <div class="game-thumb thumb-yellow"><span>➕</span><b>Math</b></div>
+            <div class="game-info">
+              <div><h3>Quick Math</h3><p>Solve before time runs out.</p></div>
+              <button onclick="openGame('math')">Play</button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="newsletter">
+        <div>
+          <span class="eyebrow">MORE GAMES COMING</span>
+          <h2>New mini games will be added regularly.</h2>
+          <p>Chalo Khelein is being built as a complete free online gaming platform.</p>
+        </div>
+        <button onclick="document.getElementById('allGames').scrollIntoView({behavior:'smooth'})">Start Playing</button>
+      </section>
+    </main>
+
+    <main id="gameScreen" class="hidden">
+      <section class="game-page">
+        <div class="game-page-header">
+          <button onclick="showHome()">← Back to Games</button>
+          <div>
+            <span class="eyebrow">NOW PLAYING</span>
+            <h1 id="gameTitle">Game</h1>
+          </div>
+          <button onclick="resetCurrentGame()">↻ Restart</button>
+        </div>
+
+        <div class="game-stage">
+          <div id="tictactoeGame" class="game-panel hidden">
+            <p id="tttStatus" class="status">Your turn: X</p>
+            <div id="tttBoard" class="ttt-board"></div>
+            <div class="mini-stats">
+              <span>You: <b id="playerWins">0</b></span>
+              <span>Computer: <b id="computerWins">0</b></span>
+            </div>
+          </div>
+
+          <div id="memoryGame" class="game-panel hidden">
+            <p class="status">Moves: <b id="memoryMoves">0</b> · Matched: <b id="memoryMatched">0</b>/6</p>
+            <div id="memoryBoard" class="memory-board"></div>
+          </div>
+
+          <div id="tapGame" class="game-panel hidden">
+            <div class="tap-info">
+              <div><small>TIME</small><strong id="tapTime">10</strong></div>
+              <div><small>TAPS</small><strong id="tapCount">0</strong></div>
+            </div>
+            <button id="tapButton" class="tap-button" onclick="handleTap()">START</button>
+            <p id="tapMessage" class="status">Click the button to start.</p>
+          </div>
+
+          <div id="guessGame" class="game-panel hidden">
+            <div class="guess-box">
+              <div class="guess-icon">🤔</div>
+              <p>Guess a number between 1 and 100.</p>
+              <input id="guessInput" type="number" min="1" max="100" placeholder="Enter number" />
+              <button onclick="submitGuess()">Check Number</button>
+              <p id="guessMessage" class="status">Enter your first guess.</p>
+              <small>Attempts: <b id="guessAttempts">0</b></small>
+            </div>
+          </div>
+
+          <div id="snakeGame" class="game-panel hidden">
+            <div class="canvas-wrap"><canvas id="snakeCanvas" width="480" height="480"></canvas></div>
+            <p class="status">Use Arrow Keys · Score: <b id="snakeScore">0</b></p>
+          </div>
+
+          <div id="penaltyGame" class="game-panel hidden">
+            <div class="goal-box">
+              <div class="goal-post"></div>
+              <div id="goalKeeper" class="keeper">🧤</div>
+              <div id="football" class="football">⚽</div>
+            </div>
+            <div class="penalty-controls">
+              <button onclick="shootBall('left')">Shoot Left</button>
+              <button onclick="shootBall('center')">Shoot Center</button>
+              <button onclick="shootBall('right')">Shoot Right</button>
+            </div>
+            <p id="penaltyMessage" class="status">Choose where to shoot.</p>
+            <p class="status">Goals: <b id="goalScore">0</b></p>
+          </div>
+
+          <div id="colorGame" class="game-panel hidden">
+            <div class="color-game">
+              <p>Click the color matching the word:</p>
+              <div id="colorWord" class="color-word">RED</div>
+              <div id="colorOptions" class="color-options"></div>
+              <p class="status">Score: <b id="colorScore">0</b></p>
+            </div>
+          </div>
+
+          <div id="mathGame" class="game-panel hidden">
+            <div class="math-game">
+              <p class="status">Time: <b id="mathTime">30</b>s · Score: <b id="mathScore">0</b></p>
+              <div id="mathQuestion" class="math-question">2 + 2 = ?</div>
+              <input id="mathInput" type="number" placeholder="Answer" />
+              <button onclick="submitMath()">Submit</button>
+              <p id="mathMessage" class="status">Solve as many as you can.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <main id="scoreScreen" class="hidden">
+      <section class="score-page">
+        <div class="game-page-header">
+          <button onclick="showHome()">← Back Home</button>
+          <div><span class="eyebrow">YOUR PROGRESS</span><h1>Score Board</h1></div>
+          <button onclick="clearScores()">Clear Scores</button>
+        </div>
+        <div class="score-summary">
+          <div class="score-trophy">🏆</div>
+          <h2>Total Score</h2>
+          <strong id="scoreBoardTotal">0</strong>
+          <div class="score-list">
+            <div><span>Tic-Tac-Toe Wins</span><b id="scoreTTT">0</b></div>
+            <div><span>Memory Completed</span><b id="scoreMemory">0</b></div>
+            <div><span>Best Tap Score</span><b id="scoreTap">0</b></div>
+            <div><span>Number Guess Wins</span><b id="scoreGuess">0</b></div>
+            <div><span>Snake Best Score</span><b id="scoreSnake">0</b></div>
+            <div><span>Penalty Goals</span><b id="scorePenalty">0</b></div>
+            <div><span>Color Catch Best</span><b id="scoreColor">0</b></div>
+            <div><span>Quick Math Best</span><b id="scoreMath">0</b></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div>
+        <div class="footer-logo"><span class="logo-mark">CK</span><strong>Chalo Khelein</strong></div>
+        <p>Free browser games for everyone.</p>
+      </div>
+      <div>
+        <strong>Games</strong>
+        <a href="#allGames">All Games</a>
+        <a href="#trending">Trending</a>
+        <a href="#categories">Categories</a>
+      </div>
+      <div>
+        <strong>Information</strong>
+        <a href="#">About Us</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Contact</a>
+      </div>
+      <div class="footer-copy">© 2026 Chalo Khelein</div>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
