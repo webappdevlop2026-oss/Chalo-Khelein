@@ -48,7 +48,7 @@
             <a class="secondary-button" href="#allGames">Explore All Games</a>
           </div>
           <div class="hero-stats">
-            <div><strong>10+</strong><span>Mini Games</span></div>
+            <div><strong>16+</strong><span>Mini Games</span></div>
             <div><strong>5</strong><span>Categories</span></div>
             <div><strong>Free</strong><span>Forever</span></div>
           </div>
@@ -158,7 +158,7 @@
             <span class="eyebrow">GAME LIBRARY</span>
             <h2>All Mini Games</h2>
           </div>
-          <span id="resultCount" class="result-count">10 Games</span>
+          <span id="resultCount" class="result-count">16 Games</span>
         </div>
 
         <div class="games-grid" id="gamesGrid">
@@ -239,6 +239,54 @@
             <div class="game-info">
               <div><h3>Cricket Timing</h3><p>Hit the ball at the perfect moment.</p></div>
               <button onclick="openGame('cricket')">Play</button>
+            </div>
+          </article>
+
+          <article class="game-card" data-category="arcade sports" data-name="car racing highway">
+            <div class="game-thumb thumb-racing"><span>🏎️</span><b>Racing</b></div>
+            <div class="game-info">
+              <div><h3>Highway Racer</h3><p>Dodge traffic and survive.</p></div>
+              <button onclick="openGame('racing')">Play</button>
+            </div>
+          </article>
+
+          <article class="game-card" data-category="arcade" data-name="brick breaker classic">
+            <div class="game-thumb thumb-brick"><span>🧱</span><b>Arcade</b></div>
+            <div class="game-info">
+              <div><h3>Brick Breaker</h3><p>Break all bricks with the ball.</p></div>
+              <button onclick="openGame('brick')">Play</button>
+            </div>
+          </article>
+
+          <article class="game-card" data-category="arcade" data-name="space shooter alien">
+            <div class="game-thumb thumb-space"><span>🚀</span><b>Shooter</b></div>
+            <div class="game-info">
+              <div><h3>Space Shooter</h3><p>Destroy enemy ships.</p></div>
+              <button onclick="openGame('space')">Play</button>
+            </div>
+          </article>
+
+          <article class="game-card" data-category="casual arcade" data-name="flappy bird sky">
+            <div class="game-thumb thumb-flappy"><span>🐦</span><b>Casual</b></div>
+            <div class="game-info">
+              <div><h3>Sky Bird</h3><p>Fly through the pipes.</p></div>
+              <button onclick="openGame('flappy')">Play</button>
+            </div>
+          </article>
+
+          <article class="game-card" data-category="sports casual" data-name="basketball shot">
+            <div class="game-thumb thumb-basket"><span>🏀</span><b>Sports</b></div>
+            <div class="game-info">
+              <div><h3>Basket Shot</h3><p>Time your shot and score.</p></div>
+              <button onclick="openGame('basket')">Play</button>
+            </div>
+          </article>
+
+          <article class="game-card" data-category="arcade casual" data-name="endless runner jump">
+            <div class="game-thumb thumb-runner"><span>🏃</span><b>Runner</b></div>
+            <div class="game-info">
+              <div><h3>Endless Runner</h3><p>Jump over obstacles.</p></div>
+              <button onclick="openGame('runner')">Play</button>
             </div>
           </article>
         </div>
@@ -375,6 +423,72 @@
               <span>Balls: <b id="cricketBalls">0</b>/12</span>
             </div>
           </div>
+
+          <div id="racingGame" class="game-panel hidden">
+            <div class="premium-game-wrap">
+              <canvas id="racingCanvas" width="700" height="450"></canvas>
+              <div id="racingOverlay" class="premium-overlay">
+                <h2>Highway Racer</h2><p>Use ← → keys to move</p>
+                <button onclick="startRacing()">Start Race</button>
+              </div>
+            </div>
+            <p class="status">Distance: <b id="racingScore">0</b> · Best: <b id="racingBest">0</b></p>
+          </div>
+
+          <div id="brickGame" class="game-panel hidden">
+            <div class="premium-game-wrap">
+              <canvas id="brickCanvas" width="700" height="450"></canvas>
+              <div id="brickOverlay" class="premium-overlay">
+                <h2>Brick Breaker</h2><p>Move mouse or use ← →</p>
+                <button onclick="startBrick()">Start Game</button>
+              </div>
+            </div>
+            <p class="status">Score: <b id="brickScore">0</b> · Lives: <b id="brickLives">3</b></p>
+          </div>
+
+          <div id="spaceGame" class="game-panel hidden">
+            <div class="premium-game-wrap">
+              <canvas id="spaceCanvas" width="700" height="450"></canvas>
+              <div id="spaceOverlay" class="premium-overlay">
+                <h2>Space Shooter</h2><p>Move with arrows · Shoot with Space</p>
+                <button onclick="startSpace()">Start Mission</button>
+              </div>
+            </div>
+            <p class="status">Score: <b id="spaceScore">0</b> · Lives: <b id="spaceLives">3</b></p>
+          </div>
+
+          <div id="flappyGame" class="game-panel hidden">
+            <div class="premium-game-wrap">
+              <canvas id="flappyCanvas" width="700" height="450"></canvas>
+              <div id="flappyOverlay" class="premium-overlay">
+                <h2>Sky Bird</h2><p>Press Space or click to fly</p>
+                <button onclick="startFlappy()">Start Flying</button>
+              </div>
+            </div>
+            <p class="status">Score: <b id="flappyScore">0</b> · Best: <b id="flappyBest">0</b></p>
+          </div>
+
+          <div id="basketGame" class="game-panel hidden">
+            <div class="basket-court">
+              <div class="basket-hoop">🧺</div>
+              <div id="basketBall" class="basket-ball">🏀</div>
+              <div id="powerBar" class="power-bar"><span></span></div>
+            </div>
+            <button class="panel-action" onclick="shootBasket()">SHOOT</button>
+            <p id="basketMessage" class="status">Watch the power bar and shoot.</p>
+            <p class="status">Score: <b id="basketScore">0</b></p>
+          </div>
+
+          <div id="runnerGame" class="game-panel hidden">
+            <div class="premium-game-wrap">
+              <canvas id="runnerCanvas" width="700" height="450"></canvas>
+              <div id="runnerOverlay" class="premium-overlay">
+                <h2>Endless Runner</h2><p>Press Space to jump</p>
+                <button onclick="startRunner()">Start Running</button>
+              </div>
+            </div>
+            <p class="status">Score: <b id="runnerScore">0</b> · Best: <b id="runnerBest">0</b></p>
+          </div>
         </div>
       </section>
     </main>
@@ -401,6 +515,12 @@
             <div><span>Quick Math Best</span><b id="scoreMath">0</b></div>
             <div><span>Reaction Best</span><b id="scoreReaction">--</b></div>
             <div><span>Cricket Best Runs</span><b id="scoreCricket">0</b></div>
+            <div><span>Highway Best</span><b id="scoreRacing">0</b></div>
+            <div><span>Brick Breaker Best</span><b id="scoreBrick">0</b></div>
+            <div><span>Space Shooter Best</span><b id="scoreSpace">0</b></div>
+            <div><span>Sky Bird Best</span><b id="scoreFlappy">0</b></div>
+            <div><span>Basket Score</span><b id="scoreBasket">0</b></div>
+            <div><span>Runner Best</span><b id="scoreRunner">0</b></div>
           </div>
         </div>
       </section>

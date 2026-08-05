@@ -1,17 +1,13 @@
-# Chalo Khelein Desktop Website V2
+# Chalo Khelein Desktop Website V3
 
-Improved desktop-first mini game website.
+Now includes 16 playable games.
 
-Playable games:
-1. Tic-Tac-Toe with smarter AI
-2. Memory Match
-3. Tap Challenge
-4. Number Guess
-5. Snake Mini with start, pause, grid and game-over
-6. Penalty Kick
-7. Color Catch
-8. Quick Math
-9. Reaction Test
-10. Cricket Timing
+New premium-style games:
+- Highway Racer
+- Brick Breaker
+- Space Shooter
+- Sky Bird
+- Basket Shot
+- Endless Runner
 
 Open index.html in Chrome or Edge.

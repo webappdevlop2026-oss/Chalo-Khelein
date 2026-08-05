@@ -301,3 +301,33 @@ a{color:inherit;text-decoration:none}
 @media(max-width:900px){
   .reaction-pad{min-height:250px}
 }
+
+.thumb-racing{background:linear-gradient(135deg,#742c2c,#1f243b)}
+.thumb-brick{background:linear-gradient(135deg,#9a4a1d,#34251d)}
+.thumb-space{background:linear-gradient(135deg,#1f3b87,#171d35)}
+.thumb-flappy{background:linear-gradient(135deg,#35a8c8,#24485a)}
+.thumb-basket{background:linear-gradient(135deg,#b65a22,#432819)}
+.thumb-runner{background:linear-gradient(135deg,#326d44,#1e3025)}
+.premium-game-wrap{
+  position:relative;max-width:700px;margin:auto;border-radius:20px;overflow:hidden;
+  border:1px solid var(--border);background:#0a0f1e
+}
+.premium-game-wrap canvas{display:block;width:100%;height:auto;background:#0a0f1e}
+.premium-overlay{
+  position:absolute;inset:0;background:rgba(7,10,20,.82);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:12px;backdrop-filter:blur(5px)
+}
+.premium-overlay h2{font-family:"Baloo 2";font-size:40px;margin:0}
+.premium-overlay p{color:var(--muted)}
+.premium-overlay button{
+  border:0;background:linear-gradient(135deg,var(--primary),#a64fff);color:#fff;
+  border-radius:12px;padding:13px 22px;font-weight:900
+}
+.basket-court{
+  max-width:700px;height:380px;margin:0 auto 20px;border-radius:20px;position:relative;overflow:hidden;
+  background:linear-gradient(#78c5f2 0 55%,#d99652 55%);border:1px solid var(--border)
+}
+.basket-hoop{position:absolute;right:13%;top:90px;font-size:70px}
+.basket-ball{position:absolute;left:15%;bottom:40px;font-size:66px;transition:1s cubic-bezier(.22,.7,.22,1)}
+.power-bar{position:absolute;left:5%;top:45px;width:28px;height:250px;border-radius:12px;background:#172038;padding:4px}
+.power-bar span{display:block;width:100%;height:20%;margin-top:80%;border-radius:8px;background:linear-gradient(#ef4444,#eab308,#22c55e)}
