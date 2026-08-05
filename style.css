@@ -717,3 +717,84 @@ body.reduce-motion *{animation:none!important;transition:none!important}
   .profile-main-card{grid-row:auto;grid-column:1/-1}
   .achievement-panel{grid-column:1/-1}
 }
+
+/* V9 Card games */
+.thumb-teenpatti{background:linear-gradient(135deg,#7a1e2b,#27151c)}
+.thumb-solitaire{background:linear-gradient(135deg,#155e3f,#14271f)}
+.thumb-crazy8{background:linear-gradient(135deg,#6b3cb8,#231836)}
+.thumb-highcard{background:linear-gradient(135deg,#9b6a20,#2d2416)}
+.card-table{
+  min-height:470px;border-radius:28px;padding:24px;position:relative;overflow:hidden;
+  background:
+    radial-gradient(circle at center,rgba(255,255,255,.06),transparent 45%),
+    linear-gradient(145deg,#0d6a45,#08482f);
+  border:10px solid #5e341d;box-shadow:inset 0 0 45px rgba(0,0,0,.35),0 24px 60px rgba(0,0,0,.35)
+}
+.table-note{position:absolute;left:20px;top:16px;color:#d8f4e5;font-size:11px}
+.player-seat{display:flex;flex-direction:column;align-items:center;gap:9px}
+.opponent-seat{margin-top:30px}.human-seat{position:absolute;left:50%;bottom:24px;transform:translateX(-50%)}
+.playing-cards,.hand-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.playing-card,.large-card,.card-slot{
+  width:82px;height:116px;border-radius:12px;background:#fff;color:#111827;
+  border:1px solid rgba(0,0,0,.2);box-shadow:0 10px 24px rgba(0,0,0,.3);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900;font-size:23px
+}
+.playing-card.red,.large-card.red{color:#dc2626}
+.playing-card.back,.back-card{background:repeating-linear-gradient(45deg,#1d4ed8 0 8px,#fff 8px 11px);color:#fff}
+.pot-box{position:absolute;left:50%;top:47%;transform:translate(-50%,-50%);padding:13px 22px;border-radius:999px;background:rgba(5,15,11,.65);color:#d6f7e7}
+.pot-box strong{display:block;text-align:center;color:#ffd54a;font-size:25px}
+.card-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px}
+.card-actions button,.discard-area button{
+  border:0;border-radius:11px;padding:11px 17px;background:#7a5cff;color:#fff;font-weight:800
+}
+.solitaire-board{min-height:520px;border-radius:24px;padding:20px;background:linear-gradient(145deg,#087043,#06452b);border:8px solid #5a321d}
+.sol-top{display:grid;grid-template-columns:90px 90px 1fr repeat(4,90px);gap:12px}
+.card-stack,.card-slot{width:82px;height:116px}
+.stock{border:0;color:#fff;background:repeating-linear-gradient(45deg,#1d4ed8 0 8px,#fff 8px 11px);border-radius:12px}
+.card-slot{border:2px dashed rgba(255,255,255,.28);background:rgba(255,255,255,.05);color:rgba(255,255,255,.35)}
+.sol-tableau{display:grid;grid-template-columns:repeat(7,1fr);gap:12px;margin-top:24px}
+.sol-column{min-height:280px;position:relative}
+.sol-column .playing-card{position:absolute;left:0}
+.crazy8-table{display:flex;flex-direction:column;align-items:center;justify-content:space-between}
+.discard-area{display:flex;align-items:center;gap:18px}
+.opponent-hand{padding:10px 16px;border-radius:999px;background:rgba(0,0,0,.25)}
+.hand-row .playing-card{cursor:pointer;transition:.2s}
+.hand-row .playing-card:hover{transform:translateY(-9px)}
+.highcard-arena{display:grid;grid-template-columns:1fr auto 1fr;gap:35px;align-items:center;max-width:700px;margin:auto;padding:45px;border-radius:26px;background:linear-gradient(145deg,#1a2442,#11172b);text-align:center}
+.highcard-arena>div:not(.versus){display:flex;flex-direction:column;align-items:center;gap:12px}
+.versus{font-size:33px;font-weight:900;color:#9d89ff}
+@media(max-width:800px){
+  .sol-top{grid-template-columns:repeat(3,90px)}
+  .sol-spacer{display:none}.sol-tableau{overflow-x:auto}
+}
+
+/* V10 City Drive */
+.thumb-citydrive{
+  background:
+    linear-gradient(180deg,rgba(83,171,219,.8),rgba(34,70,88,.25)),
+    linear-gradient(135deg,#235a72,#172938);
+}
+.city-drive-wrap{max-width:980px;aspect-ratio:900/560}
+.city-drive-wrap canvas{width:100%;height:100%}
+.drive-dashboard{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:9px;
+  max-width:980px;
+  margin:14px auto 0;
+}
+.drive-dashboard>div{
+  min-height:66px;padding:10px;border-radius:13px;text-align:center;
+  background:linear-gradient(180deg,#1c2746,#12192d);
+  border:1px solid rgba(255,255,255,.08)
+}
+.drive-dashboard small{display:block;color:#8590ad;font-size:9px;letter-spacing:1px}
+.drive-dashboard strong{display:block;margin-top:5px;font-size:13px}
+.drive-mobile-controls{display:none;justify-content:center;gap:9px;margin-top:12px}
+.drive-mobile-controls button{
+  min-width:65px;height:52px;border:0;border-radius:12px;background:#273253;color:#fff;font-weight:900
+}
+@media(max-width:900px){
+  .drive-dashboard{grid-template-columns:repeat(3,1fr)}
+  .drive-mobile-controls{display:flex}
+}

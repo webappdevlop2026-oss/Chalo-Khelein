@@ -1,15 +1,20 @@
-# Chalo Khelein V8 — Strong Gaming Platform
+# Chalo Khelein V10 — City Drive Challenge
 
-New platform features:
-- Player profile and editable player name
-- Coins, XP and levels
-- Daily reward system
-- Recently played games
-- Favourite games
-- Player achievements
-- Platform statistics
-- Persistent browser storage
-- Improved header profile
-- Reward integration with game wins and progress
+New original driving game inspired by city-driving simulators.
 
-Open index.html in Chrome or Edge.
+Features:
+- City road network
+- Steering, acceleration, reverse and brake
+- Traffic vehicles
+- Checkpoint mission
+- Fuel system
+- Damage system
+- Speedometer and dashboard
+- Difficulty support
+- Touch controls for later mobile testing
+- Score, coins, XP and best-score integration
+- No copied branding, maps or assets
+
+Controls:
+- Arrow Keys or WASD
+- Space = Brake

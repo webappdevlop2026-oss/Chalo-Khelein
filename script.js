@@ -2,7 +2,7 @@
 const platformState = JSON.parse(localStorage.getItem("ckPlatformState") || '{"name":"Guest Player","coins":0,"xp":0,"played":0,"favorites":[],"recent":[],"lastReward":0}');
 const gameEmoji = {
   tictactoe:"❌",memory:"🧠",tap:"⚡",guess:"🔢",snake:"🐍",penalty:"⚽",color:"🎨",math:"➕",
-  reaction:"🟢",cricket:"🏏",racing:"🏎️",brick:"🧱",space:"🚀",flappy:"🐦",basket:"🏀",runner:"🏃",retroball:"🔴"
+  reaction:"🟢",cricket:"🏏",racing:"🏎️",brick:"🧱",space:"🚀",flappy:"🐦",basket:"🏀",runner:"🏃",retroball:"🔴",teenpatti:"🃏",solitaire:"♠️",crazy8:"8️⃣",highcard:"👑",citydrive:"🚘"
 };
 function savePlatform(){localStorage.setItem("ckPlatformState",JSON.stringify(platformState));updatePlatformUI();}
 function getPlayerLevel(){return Math.floor(platformState.xp/100)+1;}
@@ -115,7 +115,12 @@ const gameScreenMeta = {
   flappy:{instruction:"Fly through every pipe without touching it.",controls:"Press Space or click the game screen.",tip:"Use small, controlled taps rather than long bursts."},
   basket:{instruction:"Shoot when the power meter reaches the best zone.",controls:"Click SHOOT.",tip:"Aim for the high green section of the power bar."},
   runner:{instruction:"Run as far as possible and jump over rocks.",controls:"Press Space to jump.",tip:"Jump only when an obstacle gets close."},
-  retroball:{instruction:"Guide the red ball through platforms, rings and hazards.",controls:"Arrow Left/Right · Space to jump.",tip:"Use short jumps near spikes and collect every ring."}
+  retroball:{instruction:"Guide the red ball through platforms, rings and hazards.",controls:"Arrow Left/Right · Space to jump.",tip:"Use short jumps near spikes and collect every ring."},
+  teenpatti:{instruction:"Compare three-card hands in offline practice mode.",controls:"Deal, Bet, Show or Fold buttons.",tip:"Use only virtual chips; no real money is involved."},
+  solitaire:{instruction:"Build foundation piles from Ace to King.",controls:"Click deck, waste and exposed tableau cards.",tip:"Move Aces and low cards to foundations early."},
+  crazy8:{instruction:"Match the suit or rank and empty your hand first.",controls:"Click a playable card or draw.",tip:"Save an Eight for when you get stuck."},
+  highcard:{instruction:"Draw a higher card than the computer.",controls:"Click Draw Cards.",tip:"First to five round wins takes the match."},
+  citydrive:{instruction:"Drive through city traffic and complete checkpoints safely.",controls:"Arrow Keys/WASD · Space brake.",tip:"Slow down before turns and avoid hitting traffic."}
 };
 
 function updateGameScreenMeta(name){
@@ -169,24 +174,24 @@ const gameNames = {
   tictactoe:"Tic-Tac-Toe", memory:"Memory Match", tap:"Tap Challenge",
   guess:"Number Guess", snake:"Snake Mini", penalty:"Penalty Kick",
   color:"Color Catch", math:"Quick Math", reaction:"Reaction Test", cricket:"Cricket Timing",
-  racing:"Highway Racer", brick:"Brick Breaker", space:"Space Shooter", flappy:"Sky Bird", basket:"Basket Shot", runner:"Endless Runner", retroball:"Retro Ball Jump"
+  racing:"Highway Racer", brick:"Brick Breaker", space:"Space Shooter", flappy:"Sky Bird", basket:"Basket Shot", runner:"Endless Runner", retroball:"Retro Ball Jump", teenpatti:"Teen Patti Practice", solitaire:"Classic Solitaire", crazy8:"Crazy Eights", highcard:"High Card Battle", citydrive:"City Drive Challenge"
 };
 
 let currentGame = null;
 let activeCategory = "all";
 let scores = JSON.parse(localStorage.getItem("chaloKheleinScores") || '{"ttt":0,"memory":0,"tap":0,"guess":0,"snake":0,"penalty":0,"color":0,"math":0,"reaction":0,"cricket":0}');
-if(scores.reaction===undefined)scores.reaction=0;if(scores.cricket===undefined)scores.cricket=0;["racing","brick","space","flappy","basket","runner","retroball"].forEach(k=>{if(scores[k]===undefined)scores[k]=0;});
+if(scores.reaction===undefined)scores.reaction=0;if(scores.cricket===undefined)scores.cricket=0;["racing","brick","space","flappy","basket","runner","retroball","teenpatti","solitaire","crazy8","highcard","citydrive"].forEach(k=>{if(scores[k]===undefined)scores[k]=0;});
 
 function saveScores(){
   localStorage.setItem("chaloKheleinScores",JSON.stringify(scores));
   updateScoreUI();
 }
 function totalScore(){
-  return scores.ttt*100 + scores.memory*150 + scores.tap + scores.guess*120 + scores.snake*10 + scores.penalty*15 + scores.color*10 + scores.math*10 + scores.cricket*10 + scores.racing*5 + scores.brick*5 + scores.space*5 + scores.flappy*10 + scores.basket*10 + scores.runner*5 + scores.retroball*10;
+  return scores.ttt*100 + scores.memory*150 + scores.tap + scores.guess*120 + scores.snake*10 + scores.penalty*15 + scores.color*10 + scores.math*10 + scores.cricket*10 + scores.racing*5 + scores.brick*5 + scores.space*5 + scores.flappy*10 + scores.basket*10 + scores.runner*5 + scores.retroball*10 + scores.teenpatti*20 + scores.solitaire*30 + scores.crazy8*20 + scores.highcard*15 + scores.citydrive*10;
 }
 function updateScoreUI(){
   document.getElementById("scoreBoardTotal").textContent=totalScore();
-  ["ttt","memory","tap","guess","snake","penalty","color","math","cricket","racing","brick","space","flappy","basket","runner","retroball"].forEach(k=>{
+  ["ttt","memory","tap","guess","snake","penalty","color","math","cricket","racing","brick","space","flappy","basket","runner","retroball","teenpatti","solitaire","crazy8","highcard","citydrive"].forEach(k=>{
     const id="score"+k.charAt(0).toUpperCase()+k.slice(1);
     const el=document.getElementById(id); if(el) el.textContent=scores[k]||0;
   });
@@ -202,7 +207,7 @@ function showHome(){ stopRunningGames(); currentGame=null; globalPaused=false;do
 function showScoreBoard(){ updateScoreUI(); switchScreen("score"); }
 function clearScores(){
   if(!confirm("Clear all saved scores?")) return;
-  scores={ttt:0,memory:0,tap:0,guess:0,snake:0,penalty:0,color:0,math:0,reaction:0,cricket:0,racing:0,brick:0,space:0,flappy:0,basket:0,runner:0,retroball:0};
+  scores={ttt:0,memory:0,tap:0,guess:0,snake:0,penalty:0,color:0,math:0,reaction:0,cricket:0,racing:0,brick:0,space:0,flappy:0,basket:0,runner:0,retroball:0,teenpatti:0,solitaire:0,crazy8:0,highcard:0,citydrive:0};
   saveScores();
 }
 function openGame(name){
@@ -234,9 +239,14 @@ function resetCurrentGame(){
   if(currentGame==="basket") resetBasket();
   if(currentGame==="runner") resetRunner();
   if(currentGame==="retroball") resetRetroBall();
+  if(currentGame==="teenpatti") resetTeenPatti();
+  if(currentGame==="solitaire") resetSolitaire();
+  if(currentGame==="crazy8") resetCrazy8();
+  if(currentGame==="highcard") resetHighCard();
+  if(currentGame==="citydrive") resetCityDrive();
 }
 function stopRunningGames(){
-  clearInterval(tapTimer); clearInterval(snakeTimer); clearInterval(mathTimer); clearTimeout(reactionTimer); cancelAnimationFrame(cricketAnim); cancelAnimationFrame(racingAnim); cancelAnimationFrame(brickAnim); cancelAnimationFrame(spaceAnim); cancelAnimationFrame(flappyAnim); cancelAnimationFrame(runnerAnim); cancelAnimationFrame(retroBallAnim);
+  clearInterval(tapTimer); clearInterval(snakeTimer); clearInterval(mathTimer); clearTimeout(reactionTimer); cancelAnimationFrame(cricketAnim); cancelAnimationFrame(racingAnim); cancelAnimationFrame(brickAnim); cancelAnimationFrame(spaceAnim); cancelAnimationFrame(flappyAnim); cancelAnimationFrame(runnerAnim); cancelAnimationFrame(cityDriveAnim); cancelAnimationFrame(retroBallAnim);
 }
 function filterGames(){
   const q=document.getElementById("gameSearch").value.toLowerCase().trim();
@@ -641,7 +651,7 @@ function shootBasket(){if(basketBusy)return;basketBusy=true;const ball=document.
 /* Runner */
 let runnerAnim=0,runnerRunning=false,runnerY=330,runnerV=0,runnerObs=[],runnerScore=0;
 const runnerCanvas=document.getElementById("runnerCanvas"),runctx=runnerCanvas.getContext("2d");
-function resetRunner(){cancelAnimationFrame(runnerAnim); cancelAnimationFrame(retroBallAnim);runnerRunning=false;runnerY=330;runnerV=0;runnerObs=[];runnerScore=0;document.getElementById("runnerScore").textContent=0;document.getElementById("runnerBest").textContent=scores.runner||0;document.getElementById("runnerOverlay").classList.remove("hidden");drawRunner();}
+function resetRunner(){cancelAnimationFrame(runnerAnim); cancelAnimationFrame(cityDriveAnim); cancelAnimationFrame(retroBallAnim);runnerRunning=false;runnerY=330;runnerV=0;runnerObs=[];runnerScore=0;document.getElementById("runnerScore").textContent=0;document.getElementById("runnerBest").textContent=scores.runner||0;document.getElementById("runnerOverlay").classList.remove("hidden");drawRunner();}
 function startRunner(){runnerRunning=true;document.getElementById("runnerOverlay").classList.add("hidden");runnerLoop();}
 function runnerJump(){if(runnerRunning&&runnerY>=329)runnerV=-12;}
 document.addEventListener("keydown",e=>{if(currentGame==="runner"&&e.code==="Space"){runnerJump();e.preventDefault();}});
@@ -778,3 +788,222 @@ document.addEventListener("keydown",e=>{
 document.addEventListener("keyup",e=>rbKeys[e.key]=false);
 
 updatePlatformUI();
+
+/* Shared card helpers */
+const CARD_SUITS=["♠","♥","♦","♣"],CARD_RANKS=["2","3","4","5","6","7","8","9","10","J","Q","K","A"];
+function makeDeck(){const d=[];for(const s of CARD_SUITS)for(const r of CARD_RANKS)d.push({s,r,v:CARD_RANKS.indexOf(r)+2});return shuffle(d);}
+function cardHTML(c,back=false){if(back)return '<div class="playing-card back">★</div>';const red=c.s==="♥"||c.s==="♦";return `<div class="playing-card ${red?"red":""}"><span>${c.r}</span><span>${c.s}</span></div>`;}
+function setLargeCard(el,c,back=false){if(back){el.className="large-card back-card";el.textContent="?";return;}el.className="large-card "+((c.s==="♥"||c.s==="♦")?"red":"");el.innerHTML=`<span>${c.r}</span><span>${c.s}</span>`;}
+
+/* Teen Patti Practice */
+let tpDeck=[],tpPlayer=[],tpComputer=[],tpPlayerChips=1000,tpComputerChips=1000,tpPot=0,tpActive=false;
+function resetTeenPatti(){tpPlayerChips=1000;tpComputerChips=1000;tpPot=0;tpActive=false;tpPlayer=[];tpComputer=[];renderTeenPatti();document.getElementById("tpMessage").textContent="Press Deal to start a practice hand.";}
+function renderTeenPatti(showComputer=false){
+  document.getElementById("tpPlayerCards").innerHTML=tpPlayer.map(c=>cardHTML(c)).join("");
+  document.getElementById("tpComputerCards").innerHTML=tpComputer.map(c=>cardHTML(c,!showComputer)).join("");
+  document.getElementById("tpPlayerChips").textContent=tpPlayerChips;document.getElementById("tpComputerChips").textContent=tpComputerChips;document.getElementById("tpPot").textContent=tpPot;
+}
+function tpDeal(){
+  if(tpActive)return;tpDeck=makeDeck();tpPlayer=[tpDeck.pop(),tpDeck.pop(),tpDeck.pop()];tpComputer=[tpDeck.pop(),tpDeck.pop(),tpDeck.pop()];
+  tpPot=20;tpPlayerChips-=10;tpComputerChips-=10;tpActive=true;renderTeenPatti(false);document.getElementById("tpMessage").textContent="Practice hand dealt. Bet, Show or Fold.";
+}
+function tpBet(n){
+  if(!tpActive||tpPlayerChips<n)return;tpPlayerChips-=n;tpComputerChips-=Math.min(n,tpComputerChips);tpPot+=n*2;renderTeenPatti(false);document.getElementById("tpMessage").textContent=`Both players added ${n} virtual chips.`;
+}
+function tpRankHand(hand){
+  const vals=hand.map(c=>c.v).sort((a,b)=>b-a),sameSuit=hand.every(c=>c.s===hand[0].s),counts={};vals.forEach(v=>counts[v]=(counts[v]||0)+1);
+  const groups=Object.values(counts).sort((a,b)=>b-a),straight=(vals[0]-vals[2]===2&&new Set(vals).size===3)||(vals.join(",")==="14,3,2");
+  if(groups[0]===3)return [6,vals[0]];
+  if(straight&&sameSuit)return [5,vals[0]===14&&vals[1]===3?3:vals[0]];
+  if(straight)return [4,vals[0]===14&&vals[1]===3?3:vals[0]];
+  if(sameSuit)return [3,...vals];
+  if(groups[0]===2){const pair=Number(Object.keys(counts).find(k=>counts[k]===2)),kick=Number(Object.keys(counts).find(k=>counts[k]===1));return [2,pair,kick];}
+  return [1,...vals];
+}
+function tpCompare(a,b){const ra=tpRankHand(a),rb=tpRankHand(b);for(let i=0;i<Math.max(ra.length,rb.length);i++){if((ra[i]||0)!==(rb[i]||0))return (ra[i]||0)>(rb[i]||0)?1:-1;}return 0;}
+function tpShow(){
+  if(!tpActive)return;const r=tpCompare(tpPlayer,tpComputer);renderTeenPatti(true);
+  if(r>0){tpPlayerChips+=tpPot;scores.teenpatti++;saveScores();awardPlatform(10,5);document.getElementById("tpMessage").textContent="You won the practice hand!";}
+  else if(r<0){tpComputerChips+=tpPot;document.getElementById("tpMessage").textContent="Computer won this hand.";}
+  else{tpPlayerChips+=Math.floor(tpPot/2);tpComputerChips+=Math.ceil(tpPot/2);document.getElementById("tpMessage").textContent="Tie hand.";}
+  tpPot=0;tpActive=false;renderTeenPatti(true);
+}
+function tpFold(){if(!tpActive)return;tpComputerChips+=tpPot;tpPot=0;tpActive=false;renderTeenPatti(true);document.getElementById("tpMessage").textContent="You folded. Deal again to continue."}
+
+/* Simplified Solitaire */
+let solDeck=[],solWaste=[],solTableau=[],solFound=[[],[],[],[]];
+function resetSolitaire(){
+  const d=makeDeck();solTableau=Array.from({length:7},()=>[]);
+  for(let c=0;c<7;c++)for(let r=0;r<=c;r++)solTableau[c].push({...d.pop(),face:r===c});
+  solDeck=d;solWaste=[];solFound=[[],[],[],[]];renderSolitaire();document.getElementById("solMessage").textContent="Build down in alternating colors. Double-click exposed cards to move to foundation.";
+}
+function renderSolitaire(){
+  document.getElementById("solStockCount").textContent=solDeck.length;
+  const w=document.getElementById("solWaste");w.innerHTML=solWaste.length?cardHTML(solWaste[solWaste.length-1]):"";
+  const t=document.getElementById("solTableau");t.innerHTML="";
+  solTableau.forEach((col,ci)=>{const d=document.createElement("div");d.className="sol-column";col.forEach((c,ri)=>{const wrap=document.createElement("div");wrap.style.top=(ri*28)+"px";wrap.innerHTML=cardHTML(c,!c.face);const card=wrap.firstElementChild;card.ondblclick=()=>solMoveTableauToFoundation(ci);wrap.appendChild(card);d.appendChild(wrap);});t.appendChild(d);});
+  for(let i=0;i<4;i++){const f=document.getElementById("foundation"+i);f.innerHTML=solFound[i].length?cardHTML(solFound[i][solFound[i].length-1]):"A";}
+}
+function solDraw(){if(solDeck.length)solWaste.push(solDeck.pop());else{solDeck=solWaste.reverse();solWaste=[];}renderSolitaire();}
+function solCanFoundation(c,i){const pile=solFound[i];if(!pile.length)return c.r==="A";const top=pile[pile.length-1];return top.s===c.s&&c.v===top.v+1;}
+function solAutoMoveWaste(){if(!solWaste.length)return;const c=solWaste[solWaste.length-1];for(let i=0;i<4;i++)if(solCanFoundation(c,i)){solFound[i].push(solWaste.pop());renderSolitaire();solCheckWin();return;}document.getElementById("solMessage").textContent="That card cannot move to a foundation yet.";}
+function solMoveTableauToFoundation(ci){const col=solTableau[ci];if(!col.length)return;const c=col[col.length-1];for(let i=0;i<4;i++)if(solCanFoundation(c,i)){solFound[i].push(col.pop());if(col.length)col[col.length-1].face=true;renderSolitaire();solCheckWin();return;}}
+function solCheckWin(){if(solFound.every(p=>p.length===13)){scores.solitaire++;saveScores();awardPlatform(30,15);document.getElementById("solMessage").textContent="You completed Solitaire!";}}
+
+/* Crazy Eights */
+let c8Deck=[],c8Player=[],c8Computer=[],c8Discard=[],c8Turn="player";
+function resetCrazy8(){c8Deck=makeDeck();c8Player=[];c8Computer=[];for(let i=0;i<7;i++){c8Player.push(c8Deck.pop());c8Computer.push(c8Deck.pop());}c8Discard=[c8Deck.pop()];c8Turn="player";renderCrazy8();}
+function renderCrazy8(){
+  document.getElementById("c8ComputerCount").textContent=c8Computer.length;setLargeCard(document.getElementById("c8Discard"),c8Discard[c8Discard.length-1]);
+  const h=document.getElementById("c8PlayerHand");h.innerHTML="";c8Player.forEach((c,i)=>{const w=document.createElement("div");w.innerHTML=cardHTML(c);w.firstElementChild.onclick=()=>c8PlayPlayer(i);h.appendChild(w.firstElementChild);});
+}
+function c8Playable(c){const top=c8Discard[c8Discard.length-1];return c.r==="8"||c.r===top.r||c.s===top.s;}
+function c8PlayPlayer(i){if(c8Turn!=="player")return;const c=c8Player[i];if(!c8Playable(c)){document.getElementById("c8Message").textContent="That card does not match suit or rank.";return;}c8Discard.push(c8Player.splice(i,1)[0]);renderCrazy8();if(!c8Player.length){scores.crazy8++;saveScores();awardPlatform(20,10);document.getElementById("c8Message").textContent="You won Crazy Eights!";return;}c8Turn="computer";setTimeout(c8ComputerTurn,600);}
+function c8DrawCard(){if(c8Turn!=="player")return;if(!c8Deck.length)c8Recycle();c8Player.push(c8Deck.pop());renderCrazy8();c8Turn="computer";setTimeout(c8ComputerTurn,500);}
+function c8ComputerTurn(){let i=c8Computer.findIndex(c8Playable);if(i<0){if(!c8Deck.length)c8Recycle();c8Computer.push(c8Deck.pop());i=c8Computer.findIndex(c8Playable);}if(i>=0)c8Discard.push(c8Computer.splice(i,1)[0]);renderCrazy8();if(!c8Computer.length){document.getElementById("c8Message").textContent="Computer won this round.";return;}c8Turn="player";document.getElementById("c8Message").textContent="Your turn.";}
+function c8Recycle(){const top=c8Discard.pop();c8Deck=shuffle(c8Discard);c8Discard=[top];}
+
+/* High Card Battle */
+let hcP=0,hcC=0,hcDeck=[];
+function resetHighCard(){hcP=0;hcC=0;hcDeck=makeDeck();document.getElementById("hcPlayerScore").textContent=0;document.getElementById("hcComputerScore").textContent=0;setLargeCard(document.getElementById("hcPlayerCard"),null,true);setLargeCard(document.getElementById("hcComputerCard"),null,true);document.getElementById("hcMessage").textContent="First to 5 rounds wins the match.";}
+function highCardRound(){
+  if(hcP>=5||hcC>=5)resetHighCard();if(hcDeck.length<2)hcDeck=makeDeck();const p=hcDeck.pop(),c=hcDeck.pop();setLargeCard(document.getElementById("hcPlayerCard"),p);setLargeCard(document.getElementById("hcComputerCard"),c);
+  if(p.v>c.v){hcP++;document.getElementById("hcMessage").textContent="You win this round.";}else if(c.v>p.v){hcC++;document.getElementById("hcMessage").textContent="Computer wins this round.";}else document.getElementById("hcMessage").textContent="Tie round.";
+  document.getElementById("hcPlayerScore").textContent=hcP;document.getElementById("hcComputerScore").textContent=hcC;
+  if(hcP===5){scores.highcard++;saveScores();awardPlatform(15,8);document.getElementById("hcMessage").textContent="You won the match!";}else if(hcC===5)document.getElementById("hcMessage").textContent="Computer won the match.";
+}
+
+
+/* City Drive Challenge */
+let cityDriveAnim=0,cityDriveRunning=false;
+let driveCar={x:450,y:430,angle:0,speed:0},driveKeys={},driveTouch={left:false,right:false,accel:false,brake:false};
+let driveTraffic=[],driveBuildings=[],driveCheckpoints=[],driveCheckpointIndex=0,driveFuel=100,driveDamage=0,driveScore=0;
+const cityDriveCanvas=document.getElementById("cityDriveCanvas"),dctx=cityDriveCanvas.getContext("2d");
+
+function buildCityWorld(){
+  driveBuildings=[];
+  for(let i=0;i<14;i++){
+    driveBuildings.push({x:(i%7)*145-40,y:Math.floor(i/7)*520-120,w:95,h:150+((i*31)%90),c:["#9aa6b2","#c7a27c","#8997aa","#b78d72"][i%4]});
+  }
+  driveTraffic=[
+    {x:300,y:180,a:0,s:1.7,c:"#ef4444"},
+    {x:600,y:120,a:Math.PI,s:1.5,c:"#f59e0b"},
+    {x:160,y:320,a:Math.PI/2,s:1.4,c:"#22c55e"},
+    {x:740,y:350,a:-Math.PI/2,s:1.8,c:"#a78bfa"}
+  ];
+  driveCheckpoints=[
+    {x:450,y:105,r:32},{x:785,y:270,r:32},{x:660,y:500,r:32},{x:130,y:430,r:32},{x:150,y:115,r:32}
+  ];
+}
+function resetCityDrive(){
+  cancelAnimationFrame(cityDriveAnim);cityDriveRunning=false;
+  driveCar={x:450,y:430,angle:0,speed:0};driveCheckpointIndex=0;driveFuel=100;driveDamage=0;driveScore=0;
+  buildCityWorld();updateDriveHUD();drawCityDrive();
+  const o=document.getElementById("cityDriveOverlay");o.classList.remove("hidden");
+  o.querySelector("h2").textContent="City Drive Challenge";
+  o.querySelector("p").textContent="Arrow keys or WASD · Space brake · Reach checkpoints safely";
+  o.querySelector("button").textContent="Start Mission";
+  document.getElementById("driveMessage").textContent="Follow the green checkpoint arrows and avoid traffic.";
+}
+function startCityDrive(){
+  cityDriveRunning=true;
+  document.getElementById("cityDriveOverlay").classList.add("hidden");
+  cityDriveLoop();
+}
+function updateDriveHUD(){
+  document.getElementById("driveSpeed").textContent=Math.round(Math.abs(driveCar.speed)*18);
+  document.getElementById("driveFuel").textContent=Math.max(0,Math.round(driveFuel));
+  document.getElementById("driveDamage").textContent=Math.min(100,Math.round(driveDamage));
+  document.getElementById("driveCheckpoints").textContent=driveCheckpointIndex;
+  document.getElementById("driveScore").textContent=Math.round(driveScore);
+}
+function drawRoad(){
+  dctx.fillStyle="#4d7f42";dctx.fillRect(0,0,900,560);
+  dctx.fillStyle="#3e4249";
+  dctx.fillRect(80,55,740,150);
+  dctx.fillRect(80,355,740,150);
+  dctx.fillRect(80,55,150,450);
+  dctx.fillRect(375,55,150,450);
+  dctx.fillRect(670,55,150,450);
+  dctx.strokeStyle="#f5f0d8";dctx.lineWidth=4;dctx.setLineDash([18,18]);
+  [130,450,745].forEach(x=>{dctx.beginPath();dctx.moveTo(x,55);dctx.lineTo(x,505);dctx.stroke();});
+  [130,430].forEach(y=>{dctx.beginPath();dctx.moveTo(80,y);dctx.lineTo(820,y);dctx.stroke();});
+  dctx.setLineDash([]);
+}
+function drawCityDrive(){
+  const sky=dctx.createLinearGradient(0,0,0,560);sky.addColorStop(0,"#87c8e8");sky.addColorStop(1,"#cae8f4");
+  dctx.fillStyle=sky;dctx.fillRect(0,0,900,560);
+  drawRoad();
+  driveBuildings.forEach(b=>{
+    dctx.fillStyle=b.c;dctx.fillRect(b.x,b.y,b.w,b.h);
+    dctx.fillStyle="rgba(210,240,255,.75)";
+    for(let yy=b.y+18;yy<b.y+b.h-15;yy+=30)for(let xx=b.x+12;xx<b.x+b.w-12;xx+=27)dctx.fillRect(xx,yy,13,18);
+  });
+  const cp=driveCheckpoints[driveCheckpointIndex];
+  if(cp){
+    dctx.strokeStyle="#3df28a";dctx.lineWidth=7;dctx.shadowColor="#3df28a";dctx.shadowBlur=18;
+    dctx.beginPath();dctx.arc(cp.x,cp.y,cp.r,0,Math.PI*2);dctx.stroke();dctx.shadowBlur=0;
+    dctx.fillStyle="#d8ffe8";dctx.font="bold 16px sans-serif";dctx.fillText("CHECK",cp.x-28,cp.y-42);
+  }
+  driveTraffic.forEach(t=>drawDriveCar(t.x,t.y,t.a,t.c,false));
+  drawDriveCar(driveCar.x,driveCar.y,driveCar.angle,"#22a7f0",true);
+  dctx.fillStyle="rgba(4,8,15,.68)";dctx.fillRect(14,14,188,52);
+  dctx.fillStyle="#fff";dctx.font="bold 14px sans-serif";dctx.fillText("MISSION: CHECKPOINT RUN",26,36);
+  dctx.fillStyle="#a8d8f0";dctx.font="12px sans-serif";dctx.fillText("Drive safely through the city",26,55);
+}
+function drawDriveCar(x,y,a,color,player){
+  dctx.save();dctx.translate(x,y);dctx.rotate(a);
+  dctx.shadowColor="rgba(0,0,0,.42)";dctx.shadowBlur=10;dctx.shadowOffsetY=5;
+  const g=dctx.createLinearGradient(-16,-30,16,32);g.addColorStop(0,color);g.addColorStop(1,"#152033");
+  dctx.fillStyle=g;dctx.beginPath();dctx.roundRect(-17,-31,34,62,8);dctx.fill();
+  dctx.shadowBlur=0;dctx.fillStyle="#bfe7ff";dctx.fillRect(-11,-18,22,15);
+  dctx.fillStyle="#171717";dctx.fillRect(-20,-20,5,15);dctx.fillRect(15,-20,5,15);dctx.fillRect(-20,10,5,15);dctx.fillRect(15,10,5,15);
+  dctx.fillStyle=player?"#e6fbff":"#ffd9d9";dctx.fillRect(-11,21,8,4);dctx.fillRect(3,21,8,4);
+  dctx.restore();
+}
+function cityDriveLoop(){
+  if(!cityDriveRunning)return;
+  if(globalPaused){cityDriveAnim=requestAnimationFrame(cityDriveLoop);return;}
+  const accel=driveKeys.ArrowUp||driveKeys.w||driveKeys.W||driveTouch.accel;
+  const reverse=driveKeys.ArrowDown||driveKeys.s||driveKeys.S;
+  const left=driveKeys.ArrowLeft||driveKeys.a||driveKeys.A||driveTouch.left;
+  const right=driveKeys.ArrowRight||driveKeys.d||driveKeys.D||driveTouch.right;
+  const brake=driveKeys[" "]||driveTouch.brake;
+  const maxSpeed=gameDifficulty==="hard"?6.4:gameDifficulty==="easy"?4.8:5.6;
+  if(accel&&driveFuel>0){driveCar.speed=Math.min(maxSpeed,driveCar.speed+.075);driveFuel-=.018;}
+  else if(reverse&&driveFuel>0){driveCar.speed=Math.max(-2.2,driveCar.speed-.055);driveFuel-=.012;}
+  else driveCar.speed*=.982;
+  if(brake)driveCar.speed*=.91;
+  const steering=(left?-1:0)+(right?1:0);
+  if(Math.abs(driveCar.speed)>.12)driveCar.angle+=steering*.032*(driveCar.speed>=0?1:-1);
+  driveCar.x+=Math.sin(driveCar.angle)*driveCar.speed;
+  driveCar.y-=Math.cos(driveCar.angle)*driveCar.speed;
+  driveCar.x=Math.max(24,Math.min(876,driveCar.x));driveCar.y=Math.max(24,Math.min(536,driveCar.y));
+
+  driveTraffic.forEach((t,i)=>{
+    t.x+=Math.sin(t.a)*t.s;t.y-=Math.cos(t.a)*t.s;
+    if(t.x<70)t.x=830;if(t.x>830)t.x=70;if(t.y<45)t.y=515;if(t.y>515)t.y=45;
+    const dist=Math.hypot(driveCar.x-t.x,driveCar.y-t.y);
+    if(dist<34){driveDamage=Math.min(100,driveDamage+.18);driveCar.speed*=.94;if(Math.random()<.03)playTone(110,.08,"sawtooth",.025);}
+  });
+  const cp=driveCheckpoints[driveCheckpointIndex];
+  if(cp&&Math.hypot(driveCar.x-cp.x,driveCar.y-cp.y)<cp.r+18){
+    driveCheckpointIndex++;driveScore+=200+Math.max(0,100-driveDamage);playTone(900,.15,"triangle");document.getElementById("driveMessage").textContent="Checkpoint cleared! Continue to the next marker.";
+    if(driveCheckpointIndex>=driveCheckpoints.length){finishCityDrive(true);return;}
+  }
+  driveScore+=Math.max(0,Math.abs(driveCar.speed)*.03);
+  if(driveDamage>=100||driveFuel<=0){finishCityDrive(false);return;}
+  updateDriveHUD();drawCityDrive();cityDriveAnim=requestAnimationFrame(cityDriveLoop);
+}
+function finishCityDrive(success){
+  cityDriveRunning=false;const finalScore=Math.round(driveScore);
+  if(finalScore>scores.citydrive){scores.citydrive=finalScore;saveScores();}
+  if(success){awardPlatform(25,15);document.getElementById("driveMessage").textContent="Mission completed safely!";}
+  else document.getElementById("driveMessage").textContent=driveFuel<=0?"Mission failed: Out of fuel.":"Mission failed: Car heavily damaged.";
+  const o=document.getElementById("cityDriveOverlay");o.classList.remove("hidden");
+  o.querySelector("h2").textContent=success?"Mission Complete!":"Mission Failed";
+  o.querySelector("p").textContent="Score: "+finalScore+" · Damage: "+Math.round(driveDamage)+"%";
+  o.querySelector("button").textContent="Drive Again";
+}
+document.addEventListener("keydown",e=>{driveKeys[e.key]=true;if(currentGame==="citydrive"&&["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(e.key))e.preventDefault();});
+document.addEventListener("keyup",e=>driveKeys[e.key]=false);
