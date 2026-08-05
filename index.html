@@ -11,6 +11,32 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div id="globalLoader" class="global-loader">
+    <div class="loader-logo">CK</div>
+    <h2>Chalo Khelein</h2>
+    <p>Loading game world...</p>
+    <div class="loader-bar"><span></span></div>
+  </div>
+
+  <div id="settingsPanel" class="settings-panel hidden">
+    <div class="settings-card">
+      <div class="settings-head">
+        <h2>Game Settings</h2>
+        <button onclick="toggleSettings()">✕</button>
+      </div>
+      <label><span>Sound Effects</span><input id="settingsSound" type="checkbox" checked onchange="setSoundFromSettings(this.checked)"></label>
+      <label><span>Reduced Motion</span><input id="reducedMotion" type="checkbox" onchange="setReducedMotion(this.checked)"></label>
+      <label><span>Difficulty</span>
+        <select id="difficultySelect" onchange="setDifficulty(this.value)">
+          <option value="easy">Easy</option>
+          <option value="normal" selected>Normal</option>
+          <option value="hard">Hard</option>
+        </select>
+      </label>
+      <button class="settings-save" onclick="toggleSettings()">Save & Close</button>
+    </div>
+  </div>
+
   <div class="site-shell">
     <header class="top-header">
       <a class="logo" href="#" onclick="showHome();return false;">
@@ -29,6 +55,9 @@
       </nav>
 
       <div class="header-actions">
+        <button class="icon-button" id="soundToggle" title="Sound" onclick="toggleSound()">🔊</button>
+        <button class="icon-button" title="Fullscreen" onclick="toggleFullscreen()">⛶</button>
+        <button class="icon-button" title="Settings" onclick="toggleSettings()">⚙️</button>
         <button class="icon-button" title="Scores" onclick="showScoreBoard()">🏆</button>
         <button class="profile-button">
           <span class="profile-avatar">G</span>
@@ -40,7 +69,7 @@
     <main id="homeScreen">
       <section class="hero-section">
         <div class="hero-content">
-          <span class="hero-badge">🎮 100% Free Online Games</span>
+          <span class="hero-badge">🎮 REALISTIC WEB GAME EXPERIENCE</span>
           <h1>Let’s Play.<br><span>Chalo Khelein!</span></h1>
           <p>Play quick, fun and exciting mini games directly in your browser. No download, no login, just pure entertainment.</p>
           <div class="hero-actions">
@@ -295,8 +324,8 @@
       <section class="newsletter">
         <div>
           <span class="eyebrow">MORE GAMES COMING</span>
-          <h2>New mini games will be added regularly.</h2>
-          <p>Chalo Khelein is being built as a complete free online gaming platform.</p>
+          <h2>A more realistic gaming experience is here.</h2>
+          <p>Play smooth arcade, racing, sports and puzzle games directly in your browser.</p>
         </div>
         <button onclick="document.getElementById('allGames').scrollIntoView({behavior:'smooth'})">Start Playing</button>
       </section>
@@ -310,10 +339,18 @@
             <span class="eyebrow">NOW PLAYING</span>
             <h1 id="gameTitle">Game</h1>
           </div>
-          <button onclick="resetCurrentGame()">↻ Restart</button>
+          <div class="toolbar-actions">
+            <button onclick="toggleGamePause()">⏯ Pause</button>
+            <button onclick="resetCurrentGame()">↻ Restart</button>
+          </div>
         </div>
 
         <div class="game-stage">
+          <div id="pauseOverlay" class="pause-overlay hidden">
+            <h2>Game Paused</h2>
+            <p>Press Pause again to continue.</p>
+            <button onclick="toggleGamePause()">Resume</button>
+          </div>
           <div id="tictactoeGame" class="game-panel hidden">
             <p id="tttStatus" class="status">Your turn: X</p>
             <div id="tttBoard" class="ttt-board"></div>
@@ -357,10 +394,11 @@
                 <button onclick="startSnake()">Start Game</button>
               </div>
             </div>
-            <div class="snake-controls">
+            <div class="game-hud">
               <button onclick="toggleSnakePause()" id="snakePauseBtn">Pause</button>
               <span>Score: <b id="snakeScore">0</b></span>
               <span>Best: <b id="snakeBest">0</b></span>
+              <span>Speed: <b id="snakeSpeed">1</b></span>
             </div>
           </div>
 
@@ -432,7 +470,12 @@
                 <button onclick="startRacing()">Start Race</button>
               </div>
             </div>
-            <p class="status">Distance: <b id="racingScore">0</b> · Best: <b id="racingBest">0</b></p>
+            <div class="game-hud">
+              <span>Distance: <b id="racingScore">0</b></span>
+              <span>Best: <b id="racingBest">0</b></span>
+              <span>Coins: <b id="racingCoins">0</b></span>
+              <span>Boost: <b id="racingBoost">100</b>%</span>
+            </div>
           </div>
 
           <div id="brickGame" class="game-panel hidden">
@@ -443,7 +486,12 @@
                 <button onclick="startBrick()">Start Game</button>
               </div>
             </div>
-            <p class="status">Score: <b id="brickScore">0</b> · Lives: <b id="brickLives">3</b></p>
+            <div class="game-hud">
+              <span>Score: <b id="brickScore">0</b></span>
+              <span>Lives: <b id="brickLives">3</b></span>
+              <span>Level: <b id="brickLevel">1</b></span>
+              <span>Power: <b id="brickPower">Normal</b></span>
+            </div>
           </div>
 
           <div id="spaceGame" class="game-panel hidden">
@@ -454,7 +502,12 @@
                 <button onclick="startSpace()">Start Mission</button>
               </div>
             </div>
-            <p class="status">Score: <b id="spaceScore">0</b> · Lives: <b id="spaceLives">3</b></p>
+            <div class="game-hud">
+              <span>Score: <b id="spaceScore">0</b></span>
+              <span>Lives: <b id="spaceLives">3</b></span>
+              <span>Wave: <b id="spaceWave">1</b></span>
+              <span>Boss: <b id="spaceBoss">No</b></span>
+            </div>
           </div>
 
           <div id="flappyGame" class="game-panel hidden">
@@ -529,7 +582,7 @@
     <footer class="site-footer">
       <div>
         <div class="footer-logo"><span class="logo-mark">CK</span><strong>Chalo Khelein</strong></div>
-        <p>Free browser games for everyone.</p>
+        <p>Immersive browser games with smooth graphics and real gameplay.</p>
       </div>
       <div>
         <strong>Games</strong>

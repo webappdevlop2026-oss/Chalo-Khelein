@@ -331,3 +331,96 @@ a{color:inherit;text-decoration:none}
 .basket-ball{position:absolute;left:15%;bottom:40px;font-size:66px;transition:1s cubic-bezier(.22,.7,.22,1)}
 .power-bar{position:absolute;left:5%;top:45px;width:28px;height:250px;border-radius:12px;background:#172038;padding:4px}
 .power-bar span{display:block;width:100%;height:20%;margin-top:80%;border-radius:8px;background:linear-gradient(#ef4444,#eab308,#22c55e)}
+
+/* V4 realistic visual upgrade */
+body{
+  background:
+    radial-gradient(circle at 12% 5%,rgba(92,68,220,.23),transparent 30%),
+    radial-gradient(circle at 88% 18%,rgba(35,173,187,.15),transparent 28%),
+    linear-gradient(180deg,#080c18 0%,#0b1020 55%,#090d19 100%);
+}
+.top-header{box-shadow:0 14px 40px rgba(0,0,0,.18)}
+.hero-section{
+  background:
+    linear-gradient(115deg,rgba(11,15,30,.92),rgba(47,38,109,.82) 48%,rgba(10,52,64,.75)),
+    radial-gradient(circle at 80% 30%,rgba(84,230,219,.18),transparent 32%);
+}
+.hero-section:before{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.22;
+  background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:32px 32px;
+}
+.hero-section{position:relative}
+.game-card{background:linear-gradient(180deg,#171f38,#12182c)}
+.game-card:hover{
+  box-shadow:0 24px 55px rgba(0,0,0,.42),0 0 0 1px rgba(125,95,255,.25);
+}
+.game-thumb{overflow:hidden}
+.game-thumb:after{
+  content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(0,0,0,.35));
+}
+.game-thumb span{position:relative;z-index:1;filter:drop-shadow(0 12px 18px rgba(0,0,0,.32))}
+.game-thumb b{z-index:2;backdrop-filter:blur(8px)}
+.premium-game-wrap{
+  box-shadow:0 25px 70px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,255,255,.04)
+}
+.premium-overlay{
+  background:
+    radial-gradient(circle at center,rgba(91,73,190,.22),transparent 42%),
+    rgba(5,8,18,.82);
+}
+.premium-overlay h2{text-shadow:0 8px 22px rgba(0,0,0,.4)}
+.canvas-wrap{box-shadow:0 20px 60px rgba(0,0,0,.38)}
+.goal-box,.basket-court,.cricket-ground{box-shadow:inset 0 -30px 50px rgba(0,0,0,.16),0 22px 55px rgba(0,0,0,.3)}
+.panel-action,.premium-overlay button,.game-info button{
+  box-shadow:0 10px 24px rgba(112,84,255,.28);
+  transition:.2s transform,.2s box-shadow;
+}
+.panel-action:hover,.premium-overlay button:hover,.game-info button:hover{
+  transform:translateY(-2px);box-shadow:0 15px 30px rgba(112,84,255,.38)
+}
+
+.basket-court{
+  background:
+    linear-gradient(rgba(255,255,255,.04),rgba(255,255,255,.04)),
+    linear-gradient(#69b8e6 0 54%,#c97c3e 54%);
+}
+.basket-court:before{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:46%;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 2px,transparent 2px 48px);
+}
+.basket-court:after{
+  content:"";position:absolute;left:50%;bottom:0;width:220px;height:120px;border:3px solid rgba(255,255,255,.7);
+  border-bottom:0;border-radius:120px 120px 0 0;transform:translateX(-50%);
+}
+.basket-hoop,.basket-ball,.power-bar{z-index:2}
+
+/* V5 platform controls */
+.global-loader{
+  position:fixed;inset:0;z-index:9999;background:linear-gradient(145deg,#070a14,#111833);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;transition:.5s
+}
+.global-loader.hide{opacity:0;pointer-events:none}
+.loader-logo{width:92px;height:92px;border-radius:28px;display:grid;place-items:center;font-family:"Baloo 2";font-weight:800;font-size:34px;background:linear-gradient(135deg,#7a5cff,#b149ff);box-shadow:0 25px 60px rgba(122,92,255,.45)}
+.loader-bar{width:280px;height:8px;border-radius:999px;background:#202947;overflow:hidden;margin-top:18px}
+.loader-bar span{display:block;height:100%;width:40%;background:linear-gradient(90deg,#7a5cff,#34d7d1);animation:loadbar 1.2s infinite}
+@keyframes loadbar{0%{transform:translateX(-110%)}100%{transform:translateX(360%)}}
+.settings-panel{position:fixed;inset:0;z-index:2000;background:rgba(2,5,12,.72);backdrop-filter:blur(8px);display:grid;place-items:center}
+.settings-card{width:min(460px,92vw);padding:26px;border-radius:24px;background:#151b31;border:1px solid rgba(255,255,255,.09);box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.settings-head{display:flex;align-items:center;justify-content:space-between}
+.settings-head h2{font-family:"Baloo 2";font-size:29px;margin:0}
+.settings-head button{border:0;background:#242d4f;color:#fff;width:38px;height:38px;border-radius:10px}
+.settings-card label{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.settings-card select{background:#0f1529;color:#fff;border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:9px 12px}
+.settings-save{width:100%;margin-top:20px;border:0;border-radius:12px;padding:13px;background:linear-gradient(135deg,#7a5cff,#a64fff);color:#fff;font-weight:800}
+.toolbar-actions{display:flex;justify-self:end;gap:8px}
+.pause-overlay{position:absolute;inset:0;z-index:50;background:rgba(5,8,17,.8);backdrop-filter:blur(6px);display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:28px}
+.pause-overlay h2{font-family:"Baloo 2";font-size:44px;margin:0}
+.pause-overlay p{color:var(--muted)}
+.pause-overlay button{border:0;border-radius:12px;padding:13px 20px;background:#7a5cff;color:#fff;font-weight:800}
+.game-stage{position:relative}
+.game-hud{display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap;margin-top:15px}
+.game-hud span,.game-hud button{background:#1b2340;border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:10px 14px;color:#fff}
+.game-hud span{color:#aab2ca}.game-hud b{color:#fff}
+body.reduce-motion *{animation:none!important;transition:none!important}
