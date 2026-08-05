@@ -1,20 +1,15 @@
-# Chalo Khelein V5
+# Chalo Khelein V8 — Strong Gaming Platform
 
-Major upgrades:
-- Fullscreen mode
-- Sound on/off
-- Settings panel
-- Easy / Normal / Hard difficulty
-- Global pause overlay
-- Loading screen
-- Highway Racer: coins and nitro boost
-- Brick Breaker: levels and power-up
-- Space Shooter: waves and boss battles
-- Snake: increasing speed and improved scoring
+New platform features:
+- Player profile and editable player name
+- Coins, XP and levels
+- Daily reward system
+- Recently played games
+- Favourite games
+- Player achievements
+- Platform statistics
+- Persistent browser storage
+- Improved header profile
+- Reward integration with game wins and progress
 
 Open index.html in Chrome or Edge.
-Controls:
-- Racing: Left / Right arrows, hold Shift for boost
-- Space Shooter: Arrow keys + Space
-- Snake: Arrow keys
-- Runner / Sky Bird: Space

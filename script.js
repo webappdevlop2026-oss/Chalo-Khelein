@@ -1,4 +1,133 @@
 
+const platformState = JSON.parse(localStorage.getItem("ckPlatformState") || '{"name":"Guest Player","coins":0,"xp":0,"played":0,"favorites":[],"recent":[],"lastReward":0}');
+const gameEmoji = {
+  tictactoe:"❌",memory:"🧠",tap:"⚡",guess:"🔢",snake:"🐍",penalty:"⚽",color:"🎨",math:"➕",
+  reaction:"🟢",cricket:"🏏",racing:"🏎️",brick:"🧱",space:"🚀",flappy:"🐦",basket:"🏀",runner:"🏃",retroball:"🔴"
+};
+function savePlatform(){localStorage.setItem("ckPlatformState",JSON.stringify(platformState));updatePlatformUI();}
+function getPlayerLevel(){return Math.floor(platformState.xp/100)+1;}
+function getLevelXP(){return platformState.xp%100;}
+function awardPlatform(xp=5,coins=2){
+  platformState.xp+=xp;platformState.coins+=coins;savePlatform();
+}
+function updatePlatformUI(){
+  const level=getPlayerLevel(),initial=(platformState.name||"G").charAt(0).toUpperCase();
+  document.getElementById("headerPlayerName").textContent=platformState.name;
+  document.getElementById("headerAvatar").textContent=initial;
+  document.getElementById("headerLevel").textContent="Level "+level;
+  document.getElementById("platformCoins").textContent=platformState.coins;
+  document.getElementById("platformXP").textContent=platformState.xp;
+  document.getElementById("platformPlayed").textContent=platformState.played;
+  document.getElementById("platformFavorites").textContent=platformState.favorites.length;
+  const ready=Date.now()-platformState.lastReward>86400000;
+  const btn=document.getElementById("dailyRewardBtn");btn.disabled=!ready;btn.textContent=ready?"🎁 Claim Daily Reward":"✓ Reward Claimed";
+  renderSmartSections();
+  syncFavoriteButtons();
+}
+function claimDailyReward(){
+  if(Date.now()-platformState.lastReward<86400000)return;
+  platformState.lastReward=Date.now();platformState.coins+=50;platformState.xp+=25;savePlatform();playTone(900,.2,"triangle");
+}
+function registerGamePlay(name){
+  platformState.played++;
+  platformState.recent=[name,...platformState.recent.filter(x=>x!==name)].slice(0,6);
+  platformState.xp+=3;platformState.coins+=1;savePlatform();
+}
+function toggleFavorite(name){
+  const i=platformState.favorites.indexOf(name);
+  if(i>=0)platformState.favorites.splice(i,1);else platformState.favorites.push(name);
+  savePlatform();
+}
+function toggleFavoriteFromCard(btn){
+  const card=btn.closest(".game-card");
+  const playBtn=card.querySelector(".game-info button");
+  const m=playBtn.getAttribute("onclick").match(/openGame\('([^']+)'\)/);
+  if(m)toggleFavorite(m[1]);
+}
+function syncFavoriteButtons(){
+  document.querySelectorAll(".game-card").forEach(card=>{
+    const playBtn=card.querySelector(".game-info button");if(!playBtn)return;
+    const m=playBtn.getAttribute("onclick").match(/openGame\('([^']+)'\)/);if(!m)return;
+    const fav=platformState.favorites.includes(m[1]),btn=card.querySelector(".favorite-toggle");
+    if(btn){btn.classList.toggle("active",fav);btn.textContent=fav?"♥":"♡";}
+  });
+}
+function renderSmartSections(){
+  renderSmart("recentGames",platformState.recent);
+  renderSmart("favoriteGames",platformState.favorites);
+}
+function renderSmart(id,list){
+  const box=document.getElementById(id);if(!box)return;
+  if(!list.length){box.className="smart-grid empty-smart";box.textContent=id==="recentGames"?"No games played yet.":"No favourite games yet.";return;}
+  box.className="smart-grid";box.innerHTML="";
+  list.forEach(name=>{
+    const c=document.createElement("div");c.className="smart-card";c.onclick=()=>openGame(name);
+    c.innerHTML=`<span>${gameEmoji[name]||"🎮"}</span><strong>${gameNames[name]||name}</strong><small>Play now →</small>`;
+    box.appendChild(c);
+  });
+}
+function showProfile(){
+  Object.values(screens).forEach(s=>s.classList.add("hidden"));
+  document.getElementById("profileScreen").classList.remove("hidden");
+  renderProfile();window.scrollTo({top:0,behavior:"smooth"});
+}
+function editPlayerName(){
+  const name=prompt("Enter player name:",platformState.name);
+  if(name&&name.trim()){platformState.name=name.trim().slice(0,24);savePlatform();renderProfile();}
+}
+function renderProfile(){
+  const level=getPlayerLevel(),xp=getLevelXP(),initial=platformState.name.charAt(0).toUpperCase();
+  document.getElementById("profilePlayerName").textContent=platformState.name;
+  document.getElementById("profileAvatar").textContent=initial;
+  document.getElementById("profileLevelText").textContent="Level "+level;
+  document.getElementById("xpFill").style.width=xp+"%";
+  document.getElementById("xpProgress").textContent=xp+" / 100 XP";
+  document.getElementById("profileCoins").textContent=platformState.coins;
+  document.getElementById("profilePlayed").textContent=platformState.played;
+  document.getElementById("profileScore").textContent=totalScore();
+  const ach=[
+    ["🎮","First Game","Play your first game",platformState.played>=1],
+    ["🔥","Game Fan","Play 10 games",platformState.played>=10],
+    ["⭐","Level 5","Reach level 5",level>=5],
+    ["🪙","Coin Collector","Collect 100 coins",platformState.coins>=100],
+    ["❤️","Collector","Favourite 5 games",platformState.favorites.length>=5],
+    ["🏆","Score Hunter","Reach 1,000 total score",totalScore()>=1000]
+  ];
+  const g=document.getElementById("achievementGrid");g.innerHTML="";
+  ach.forEach(a=>{const d=document.createElement("div");d.className="achievement"+(a[3]?"":" locked");d.innerHTML=`<span>${a[0]}</span><strong>${a[1]}</strong><small>${a[2]}</small>`;g.appendChild(d);});
+}
+
+
+const gameScreenMeta = {
+  tictactoe:{instruction:"Make three marks in a row before the computer.",controls:"Click any empty square.",tip:"Take the center square whenever it is available."},
+  memory:{instruction:"Open cards and match every identical pair.",controls:"Click two cards to reveal them.",tip:"Remember the position of every card you reveal."},
+  tap:{instruction:"Tap as quickly as possible before time runs out.",controls:"Click the large TAP button.",tip:"Use one finger and keep a steady rhythm."},
+  guess:{instruction:"Find the hidden number from 1 to 100.",controls:"Type a number and press Enter.",tip:"Use the higher/lower hints to cut the range in half."},
+  snake:{instruction:"Eat food, grow longer and avoid crashing.",controls:"Use the Arrow Keys.",tip:"Plan turns early when your snake becomes long."},
+  penalty:{instruction:"Beat the goalkeeper and score goals.",controls:"Choose Left, Center or Right.",tip:"Change your shooting direction often."},
+  color:{instruction:"Select the actual color named by the word.",controls:"Click a colored button.",tip:"Read the word, not the color used to display it."},
+  math:{instruction:"Solve as many questions as possible in 30 seconds.",controls:"Type the answer and press Enter.",tip:"Accuracy is more valuable than random fast answers."},
+  reaction:{instruction:"Wait for green, then click instantly.",controls:"Click Start, then click the colored panel.",tip:"Clicking before green counts as too soon."},
+  cricket:{instruction:"Time the bat swing as the ball reaches the batter.",controls:"Click SWING BAT.",tip:"Swing in the final part of the ball's journey."},
+  racing:{instruction:"Dodge traffic, collect coins and cover maximum distance.",controls:"Arrow Left/Right · Hold Shift for boost.",tip:"Save boost for crowded traffic sections."},
+  brick:{instruction:"Break every brick without losing the ball.",controls:"Move mouse or use Arrow Keys.",tip:"Hit the ball with different paddle areas to change direction."},
+  space:{instruction:"Destroy enemy ships and survive boss waves.",controls:"Arrow Keys to move · Space to shoot.",tip:"Keep moving while firing continuously."},
+  flappy:{instruction:"Fly through every pipe without touching it.",controls:"Press Space or click the game screen.",tip:"Use small, controlled taps rather than long bursts."},
+  basket:{instruction:"Shoot when the power meter reaches the best zone.",controls:"Click SHOOT.",tip:"Aim for the high green section of the power bar."},
+  runner:{instruction:"Run as far as possible and jump over rocks.",controls:"Press Space to jump.",tip:"Jump only when an obstacle gets close."},
+  retroball:{instruction:"Guide the red ball through platforms, rings and hazards.",controls:"Arrow Left/Right · Space to jump.",tip:"Use short jumps near spikes and collect every ring."}
+};
+
+function updateGameScreenMeta(name){
+  const m=gameScreenMeta[name]||{instruction:"Play and beat your best score.",controls:"Use the displayed controls.",tip:"Practice improves your score."};
+  const title=gameNames[name]||"Mini Game";
+  document.getElementById("gameInstruction").textContent=m.instruction;
+  document.getElementById("sideGameName").textContent=title;
+  document.getElementById("sideGameControls").textContent=m.controls;
+  document.getElementById("sideGameTip").textContent=m.tip;
+}
+
+
 let soundEnabled = JSON.parse(localStorage.getItem("ckSound") ?? "true");
 let gameDifficulty = localStorage.getItem("ckDifficulty") || "normal";
 let globalPaused = false;
@@ -32,31 +161,32 @@ function toggleGamePause(){
 const screens = {
   home: document.getElementById("homeScreen"),
   game: document.getElementById("gameScreen"),
-  score: document.getElementById("scoreScreen")
+  score: document.getElementById("scoreScreen"),
+  profile: document.getElementById("profileScreen")
 };
 
 const gameNames = {
   tictactoe:"Tic-Tac-Toe", memory:"Memory Match", tap:"Tap Challenge",
   guess:"Number Guess", snake:"Snake Mini", penalty:"Penalty Kick",
   color:"Color Catch", math:"Quick Math", reaction:"Reaction Test", cricket:"Cricket Timing",
-  racing:"Highway Racer", brick:"Brick Breaker", space:"Space Shooter", flappy:"Sky Bird", basket:"Basket Shot", runner:"Endless Runner"
+  racing:"Highway Racer", brick:"Brick Breaker", space:"Space Shooter", flappy:"Sky Bird", basket:"Basket Shot", runner:"Endless Runner", retroball:"Retro Ball Jump"
 };
 
 let currentGame = null;
 let activeCategory = "all";
 let scores = JSON.parse(localStorage.getItem("chaloKheleinScores") || '{"ttt":0,"memory":0,"tap":0,"guess":0,"snake":0,"penalty":0,"color":0,"math":0,"reaction":0,"cricket":0}');
-if(scores.reaction===undefined)scores.reaction=0;if(scores.cricket===undefined)scores.cricket=0;["racing","brick","space","flappy","basket","runner"].forEach(k=>{if(scores[k]===undefined)scores[k]=0;});
+if(scores.reaction===undefined)scores.reaction=0;if(scores.cricket===undefined)scores.cricket=0;["racing","brick","space","flappy","basket","runner","retroball"].forEach(k=>{if(scores[k]===undefined)scores[k]=0;});
 
 function saveScores(){
   localStorage.setItem("chaloKheleinScores",JSON.stringify(scores));
   updateScoreUI();
 }
 function totalScore(){
-  return scores.ttt*100 + scores.memory*150 + scores.tap + scores.guess*120 + scores.snake*10 + scores.penalty*15 + scores.color*10 + scores.math*10 + scores.cricket*10 + scores.racing*5 + scores.brick*5 + scores.space*5 + scores.flappy*10 + scores.basket*10 + scores.runner*5;
+  return scores.ttt*100 + scores.memory*150 + scores.tap + scores.guess*120 + scores.snake*10 + scores.penalty*15 + scores.color*10 + scores.math*10 + scores.cricket*10 + scores.racing*5 + scores.brick*5 + scores.space*5 + scores.flappy*10 + scores.basket*10 + scores.runner*5 + scores.retroball*10;
 }
 function updateScoreUI(){
   document.getElementById("scoreBoardTotal").textContent=totalScore();
-  ["ttt","memory","tap","guess","snake","penalty","color","math","cricket","racing","brick","space","flappy","basket","runner"].forEach(k=>{
+  ["ttt","memory","tap","guess","snake","penalty","color","math","cricket","racing","brick","space","flappy","basket","runner","retroball"].forEach(k=>{
     const id="score"+k.charAt(0).toUpperCase()+k.slice(1);
     const el=document.getElementById(id); if(el) el.textContent=scores[k]||0;
   });
@@ -72,13 +202,15 @@ function showHome(){ stopRunningGames(); currentGame=null; globalPaused=false;do
 function showScoreBoard(){ updateScoreUI(); switchScreen("score"); }
 function clearScores(){
   if(!confirm("Clear all saved scores?")) return;
-  scores={ttt:0,memory:0,tap:0,guess:0,snake:0,penalty:0,color:0,math:0,reaction:0,cricket:0,racing:0,brick:0,space:0,flappy:0,basket:0,runner:0};
+  scores={ttt:0,memory:0,tap:0,guess:0,snake:0,penalty:0,color:0,math:0,reaction:0,cricket:0,racing:0,brick:0,space:0,flappy:0,basket:0,runner:0,retroball:0};
   saveScores();
 }
 function openGame(name){
+  registerGamePlay(name);
   stopRunningGames();globalPaused=false;document.getElementById("pauseOverlay")?.classList.add("hidden");playTone(520,.08,"square");
   currentGame=name;
   document.getElementById("gameTitle").textContent=gameNames[name];
+  updateGameScreenMeta(name);
   document.querySelectorAll(".game-panel").forEach(p=>p.classList.add("hidden"));
   document.getElementById(name+"Game").classList.remove("hidden");
   switchScreen("game");
@@ -101,9 +233,10 @@ function resetCurrentGame(){
   if(currentGame==="flappy") resetFlappy();
   if(currentGame==="basket") resetBasket();
   if(currentGame==="runner") resetRunner();
+  if(currentGame==="retroball") resetRetroBall();
 }
 function stopRunningGames(){
-  clearInterval(tapTimer); clearInterval(snakeTimer); clearInterval(mathTimer); clearTimeout(reactionTimer); cancelAnimationFrame(cricketAnim); cancelAnimationFrame(racingAnim); cancelAnimationFrame(brickAnim); cancelAnimationFrame(spaceAnim); cancelAnimationFrame(flappyAnim); cancelAnimationFrame(runnerAnim);
+  clearInterval(tapTimer); clearInterval(snakeTimer); clearInterval(mathTimer); clearTimeout(reactionTimer); cancelAnimationFrame(cricketAnim); cancelAnimationFrame(racingAnim); cancelAnimationFrame(brickAnim); cancelAnimationFrame(spaceAnim); cancelAnimationFrame(flappyAnim); cancelAnimationFrame(runnerAnim); cancelAnimationFrame(retroBallAnim);
 }
 function filterGames(){
   const q=document.getElementById("gameSearch").value.toLowerCase().trim();
@@ -138,7 +271,7 @@ function renderTtt(){
 function playTtt(i){
   if(tttLocked||ttt[i]) return;
   ttt[i]="X"; renderTtt();
-  if(checkWinner("X")){playTone(880,.18,"triangle");document.getElementById("tttStatus").textContent="🎉 You won!";playerWins++;scores.ttt++;saveScores();updateTttStats();tttLocked=true;return;}
+  if(checkWinner("X")){playTone(880,.18,"triangle");document.getElementById("tttStatus").textContent="🎉 You won!";playerWins++;scores.ttt++;saveScores();awardPlatform(15,8);updateTttStats();tttLocked=true;return;}
   if(ttt.every(Boolean)){document.getElementById("tttStatus").textContent="Draw!";tttLocked=true;return;}
   tttLocked=true; document.getElementById("tttStatus").textContent="Computer is thinking...";
   setTimeout(computerMove,420);
@@ -192,7 +325,7 @@ function flipMemory(c){
   secondCard=c;memoryMoves++;updateMemoryStats();renderMemory();
   if(firstCard.icon===secondCard.icon){playTone(720,.09,"sine");
     firstCard.matched=secondCard.matched=true;memoryMatched++;firstCard=secondCard=null;renderMemory();updateMemoryStats();
-    if(memoryMatched===6){scores.memory++;saveScores();setTimeout(()=>alert("Memory game completed!"),150);}
+    if(memoryMatched===6){scores.memory++;saveScores();awardPlatform(18,10);setTimeout(()=>alert("Memory game completed!"),150);}
   }else{
     memoryLocked=true;setTimeout(()=>{firstCard=secondCard=null;memoryLocked=false;renderMemory();},700);
   }
@@ -216,7 +349,7 @@ function submitGuess(){
   const v=Number(document.getElementById("guessInput").value);
   if(!v||v<1||v>100){document.getElementById("guessMessage").textContent="Enter a number from 1 to 100.";return;}
   guessAttempts++;document.getElementById("guessAttempts").textContent=guessAttempts;
-  if(v===secretNumber){playTone(900,.16,"triangle");document.getElementById("guessMessage").textContent=`🎉 Correct! Number was ${secretNumber}`;scores.guess++;saveScores();}
+  if(v===secretNumber){playTone(900,.16,"triangle");document.getElementById("guessMessage").textContent=`🎉 Correct! Number was ${secretNumber}`;scores.guess++;saveScores();awardPlatform(12,6);}
   else document.getElementById("guessMessage").textContent=v<secretNumber?"Try a bigger number ↑":"Try a smaller number ↓";
 }
 document.getElementById("guessInput").addEventListener("keydown",e=>{if(e.key==="Enter")submitGuess();});
@@ -281,7 +414,7 @@ function shootBall(dir){
   const ball=document.getElementById("football");ball.style.left=pos[dir];ball.style.bottom="180px";
   setTimeout(()=>{
     if(dir===keeper)document.getElementById("penaltyMessage").textContent="Saved by goalkeeper!";
-    else{goalScore++;scores.penalty++;saveScores();document.getElementById("goalScore").textContent=goalScore;document.getElementById("penaltyMessage").textContent="GOAL! ⚽";}
+    else{goalScore++;scores.penalty++;saveScores();awardPlatform(4,2);document.getElementById("goalScore").textContent=goalScore;document.getElementById("penaltyMessage").textContent="GOAL! ⚽";}
     setTimeout(()=>{ball.style.left="50%";ball.style.bottom="20px";document.getElementById("goalKeeper").style.left="50%";penaltyBusy=false;},650);
   },550);
 }
@@ -296,7 +429,7 @@ function nextColor(){
   const opts=document.getElementById("colorOptions");opts.innerHTML="";
   shuffle(colors).forEach(c=>{const b=document.createElement("button");b.style.background=c[1];b.onclick=()=>chooseColor(c[0]);opts.appendChild(b);});
 }
-function chooseColor(name){if(name===currentColor){colorScore++;document.getElementById("colorScore").textContent=colorScore;if(colorScore>scores.color){scores.color=colorScore;saveScores();}}else colorScore=0;nextColor();}
+function chooseColor(name){if(name===currentColor){colorScore++;document.getElementById("colorScore").textContent=colorScore;if(colorScore>scores.color){scores.color=colorScore;saveScores();awardPlatform(5,2);}}else colorScore=0;nextColor();}
 
 /* Math */
 let mathTimer=null,mathTime=30,mathScore=0,mathAnswer=0;
@@ -383,7 +516,7 @@ function swingBat(){
     document.getElementById("cricketRuns").textContent=cricketRuns;
     document.getElementById("cricketBalls").textContent=cricketBalls+"/12";
     document.getElementById("cricketMessage").textContent=runs===6?"SIX! Perfect timing!":runs===4?"FOUR! Great shot!":runs+" run"+(runs>1?"s":"")+"!";
-    if(cricketRuns>scores.cricket){scores.cricket=cricketRuns;saveScores();}
+    if(cricketRuns>scores.cricket){scores.cricket=cricketRuns;saveScores();awardPlatform(8,4);}
     setTimeout(startCricketBall,850);
   }else{
     document.getElementById("cricketMessage").textContent="Too early! Watch the ball.";
@@ -508,10 +641,140 @@ function shootBasket(){if(basketBusy)return;basketBusy=true;const ball=document.
 /* Runner */
 let runnerAnim=0,runnerRunning=false,runnerY=330,runnerV=0,runnerObs=[],runnerScore=0;
 const runnerCanvas=document.getElementById("runnerCanvas"),runctx=runnerCanvas.getContext("2d");
-function resetRunner(){cancelAnimationFrame(runnerAnim);runnerRunning=false;runnerY=330;runnerV=0;runnerObs=[];runnerScore=0;document.getElementById("runnerScore").textContent=0;document.getElementById("runnerBest").textContent=scores.runner||0;document.getElementById("runnerOverlay").classList.remove("hidden");drawRunner();}
+function resetRunner(){cancelAnimationFrame(runnerAnim); cancelAnimationFrame(retroBallAnim);runnerRunning=false;runnerY=330;runnerV=0;runnerObs=[];runnerScore=0;document.getElementById("runnerScore").textContent=0;document.getElementById("runnerBest").textContent=scores.runner||0;document.getElementById("runnerOverlay").classList.remove("hidden");drawRunner();}
 function startRunner(){runnerRunning=true;document.getElementById("runnerOverlay").classList.add("hidden");runnerLoop();}
 function runnerJump(){if(runnerRunning&&runnerY>=329)runnerV=-12;}
 document.addEventListener("keydown",e=>{if(currentGame==="runner"&&e.code==="Space"){runnerJump();e.preventDefault();}});
 function drawRunner(){runctx.fillStyle="#9fd3ff";runctx.fillRect(0,0,700,450);runctx.fillStyle="#4e9f53";runctx.fillRect(0,390,700,60);runctx.font="48px sans-serif";runctx.fillText("🏃",90,runnerY+45);runnerObs.forEach(o=>{runctx.font="45px sans-serif";runctx.fillText("🪨",o.x,388);});}
 function runnerLoop(){if(globalPaused){requestAnimationFrame(runnerLoop);return;}if(!runnerRunning)return;runnerV+=.65;runnerY+=runnerV;if(runnerY>330){runnerY=330;runnerV=0;}if(Math.random()<.02)runnerObs.push({x:720});runnerObs.forEach(o=>o.x-=5);for(const o of runnerObs){if(o.x<140&&o.x>80&&runnerY>285){endRunner();return;}if(!o.passed&&o.x<80){o.passed=true;runnerScore++;document.getElementById("runnerScore").textContent=runnerScore;}}runnerObs=runnerObs.filter(o=>o.x>-60);drawRunner();runnerAnim=requestAnimationFrame(runnerLoop);}
 function endRunner(){runnerRunning=false;if(runnerScore>scores.runner){scores.runner=runnerScore;saveScores();}const o=document.getElementById("runnerOverlay");o.classList.remove("hidden");o.querySelector("h2").textContent="Game Over";o.querySelector("p").textContent="Score: "+runnerScore;o.querySelector("button").textContent="Run Again";}
+
+
+/* Retro Ball Jump */
+let retroBallAnim=0,retroBallRunning=false,rbX=70,rbY=320,rbVX=0,rbVY=0,rbOnGround=false;
+let rbLevel=1,rbRings=0,rbLives=3,rbCamera=0,rbKeys={};
+let rbPlatforms=[],rbCollectibles=[],rbSpikes=[],rbGoal={x:1300,y:250};
+const retroBallCanvas=document.getElementById("retroBallCanvas"),rbctx=retroBallCanvas.getContext("2d");
+
+function buildRetroLevel(level){
+  rbPlatforms=[
+    {x:0,y:390,w:350,h:60},
+    {x:410,y:350,w:170,h:30},
+    {x:650,y:300,w:170,h:30},
+    {x:880,y:365,w:190,h:30},
+    {x:1140,y:315,w:240,h:35}
+  ];
+  if(level>=2){
+    rbPlatforms.push({x:1450,y:260,w:180,h:30},{x:1700,y:350,w:250,h:40});
+    rbGoal={x:1870,y:290};
+  }else rbGoal={x:1300,y:255};
+
+  rbCollectibles=[
+    {x:180,y:345,taken:false},{x:460,y:305,taken:false},{x:710,y:255,taken:false},
+    {x:950,y:320,taken:false},{x:1200,y:270,taken:false}
+  ];
+  if(level>=2)rbCollectibles.push({x:1510,y:215,taken:false},{x:1780,y:305,taken:false});
+  rbSpikes=[{x:350,y:370,w:60},{x:590,y:370,w:55},{x:1075,y:370,w:60}];
+}
+function resetRetroBall(){
+  cancelAnimationFrame(retroBallAnim);retroBallRunning=false;rbX=70;rbY=320;rbVX=0;rbVY=0;rbOnGround=false;
+  rbLevel=1;rbRings=0;rbLives=3;rbCamera=0;buildRetroLevel(rbLevel);
+  document.getElementById("retroBallLevel").textContent=rbLevel;
+  document.getElementById("retroBallRings").textContent=rbRings;
+  document.getElementById("retroBallLives").textContent=rbLives;
+  document.getElementById("retroBallBest").textContent=scores.retroball||0;
+  document.getElementById("retroBallOverlay").classList.remove("hidden");
+  drawRetroBall();
+}
+function startRetroBall(){
+  retroBallRunning=true;
+  document.getElementById("retroBallOverlay").classList.add("hidden");
+  retroBallLoop();
+}
+function respawnRetroBall(){
+  rbX=70;rbY=300;rbVX=0;rbVY=0;rbCamera=0;
+}
+function nextRetroLevel(){
+  rbLevel++;
+  if(rbLevel>2){
+    retroBallRunning=false;
+    const score=rbRings+rbLives*5;
+    if(score>scores.retroball){scores.retroball=score;saveScores();}
+    const o=document.getElementById("retroBallOverlay");o.classList.remove("hidden");
+    o.querySelector("h2").textContent="Adventure Complete!";
+    o.querySelector("p").textContent="Rings collected: "+rbRings;
+    o.querySelector("button").textContent="Play Again";
+    return;
+  }
+  rbX=70;rbY=300;rbCamera=0;buildRetroLevel(rbLevel);
+  document.getElementById("retroBallLevel").textContent=rbLevel;
+}
+function drawRetroBall(){
+  const sky=rbctx.createLinearGradient(0,0,0,450);sky.addColorStop(0,"#6ec6f2");sky.addColorStop(1,"#d9f2ff");
+  rbctx.fillStyle=sky;rbctx.fillRect(0,0,700,450);
+  // clouds and hills
+  rbctx.fillStyle="rgba(255,255,255,.8)";
+  for(let i=0;i<4;i++){let x=70+i*190-(rbCamera*.15%760);rbctx.beginPath();rbctx.arc(x,75,25,0,Math.PI*2);rbctx.arc(x+28,65,32,0,Math.PI*2);rbctx.arc(x+60,76,23,0,Math.PI*2);rbctx.fill();}
+  rbctx.fillStyle="#64b86a";rbctx.beginPath();rbctx.moveTo(0,360);for(let x=0;x<=700;x+=90)rbctx.lineTo(x,300+Math.sin((x+rbCamera*.25)*.014)*32);rbctx.lineTo(700,450);rbctx.lineTo(0,450);rbctx.closePath();rbctx.fill();
+
+  rbctx.save();rbctx.translate(-rbCamera,0);
+  rbPlatforms.forEach(p=>{
+    const pg=rbctx.createLinearGradient(0,p.y,0,p.y+p.h);pg.addColorStop(0,"#8bd06f");pg.addColorStop(.18,"#4f9b48");pg.addColorStop(1,"#6b4a2e");
+    rbctx.fillStyle=pg;rbctx.fillRect(p.x,p.y,p.w,p.h);
+    rbctx.fillStyle="#b9e789";rbctx.fillRect(p.x,p.y,p.w,7);
+  });
+  rbSpikes.forEach(s=>{
+    rbctx.fillStyle="#dce3ea";
+    for(let x=s.x;x<s.x+s.w;x+=18){rbctx.beginPath();rbctx.moveTo(x,390);rbctx.lineTo(x+9,364);rbctx.lineTo(x+18,390);rbctx.closePath();rbctx.fill();}
+  });
+  rbCollectibles.forEach(c=>{if(!c.taken){rbctx.strokeStyle="#ffd43b";rbctx.lineWidth=6;rbctx.beginPath();rbctx.arc(c.x,c.y,11,0,Math.PI*2);rbctx.stroke();}});
+  // goal
+  rbctx.fillStyle="#f8fafc";rbctx.fillRect(rbGoal.x,rbGoal.y,7,100);
+  rbctx.fillStyle="#7c3aed";rbctx.beginPath();rbctx.moveTo(rbGoal.x+7,rbGoal.y);rbctx.lineTo(rbGoal.x+65,rbGoal.y+20);rbctx.lineTo(rbGoal.x+7,rbGoal.y+40);rbctx.closePath();rbctx.fill();
+
+  // red ball
+  const ball=rbctx.createRadialGradient(rbX-8,rbY-10,3,rbX,rbY,24);ball.addColorStop(0,"#ff9aa8");ball.addColorStop(.35,"#ef334e");ball.addColorStop(1,"#8f1026");
+  rbctx.shadowColor="rgba(0,0,0,.35)";rbctx.shadowBlur=14;rbctx.shadowOffsetY=8;
+  rbctx.fillStyle=ball;rbctx.beginPath();rbctx.arc(rbX,rbY,22,0,Math.PI*2);rbctx.fill();
+  rbctx.shadowBlur=0;rbctx.fillStyle="#fff";rbctx.beginPath();rbctx.arc(rbX-7,rbY-7,5,0,Math.PI*2);rbctx.fill();
+  rbctx.restore();
+}
+function retroBallLoop(){
+  if(!retroBallRunning)return;
+  if(globalPaused){retroBallAnim=requestAnimationFrame(retroBallLoop);return;}
+  const speed=gameDifficulty==="hard"?4.8:gameDifficulty==="easy"?3.4:4.1;
+  rbVX=0;if(rbKeys.ArrowLeft)rbVX=-speed;if(rbKeys.ArrowRight)rbVX=speed;
+  rbX+=rbVX;rbVY+=.58;rbY+=rbVY;rbOnGround=false;
+
+  for(const p of rbPlatforms){
+    if(rbX+18>p.x&&rbX-18<p.x+p.w&&rbY+22>=p.y&&rbY+22<=p.y+18&&rbVY>=0){
+      rbY=p.y-22;rbVY=0;rbOnGround=true;
+    }
+  }
+  for(const c of rbCollectibles){
+    if(!c.taken&&Math.hypot(rbX-c.x,rbY-c.y)<32){c.taken=true;rbRings++;playTone(930,.07,"sine");document.getElementById("retroBallRings").textContent=rbRings;}
+  }
+  for(const s of rbSpikes){
+    if(rbX+17>s.x&&rbX-17<s.x+s.w&&rbY+20>355){rbLives--;playTone(120,.18,"sawtooth");document.getElementById("retroBallLives").textContent=rbLives;if(rbLives<=0){endRetroBall();return;}respawnRetroBall();}
+  }
+  if(rbY>500){rbLives--;document.getElementById("retroBallLives").textContent=rbLives;if(rbLives<=0){endRetroBall();return;}respawnRetroBall();}
+  if(rbX>rbGoal.x+15){nextRetroLevel();if(!retroBallRunning)return;}
+  rbCamera=Math.max(0,rbX-220);
+  drawRetroBall();retroBallAnim=requestAnimationFrame(retroBallLoop);
+}
+function endRetroBall(){
+  retroBallRunning=false;
+  const score=rbRings;
+  if(score>scores.retroball){scores.retroball=score;saveScores();}
+  const o=document.getElementById("retroBallOverlay");o.classList.remove("hidden");
+  o.querySelector("h2").textContent="Game Over";
+  o.querySelector("p").textContent="Rings: "+rbRings;
+  o.querySelector("button").textContent="Try Again";
+}
+document.addEventListener("keydown",e=>{
+  rbKeys[e.key]=true;
+  if(currentGame==="retroball"&&e.code==="Space"&&rbOnGround){rbVY=-11.5;playTone(360,.05,"sine");e.preventDefault();}
+});
+document.addEventListener("keyup",e=>rbKeys[e.key]=false);
+
+updatePlatformUI();

@@ -59,9 +59,12 @@
         <button class="icon-button" title="Fullscreen" onclick="toggleFullscreen()">⛶</button>
         <button class="icon-button" title="Settings" onclick="toggleSettings()">⚙️</button>
         <button class="icon-button" title="Scores" onclick="showScoreBoard()">🏆</button>
-        <button class="profile-button">
-          <span class="profile-avatar">G</span>
-          <span>Guest Player</span>
+        <button class="profile-button" onclick="showProfile()">
+          <span class="profile-avatar" id="headerAvatar">G</span>
+          <span>
+            <b id="headerPlayerName">Guest Player</b>
+            <small id="headerLevel">Level 1</small>
+          </span>
         </button>
       </div>
     </header>
@@ -77,7 +80,7 @@
             <a class="secondary-button" href="#allGames">Explore All Games</a>
           </div>
           <div class="hero-stats">
-            <div><strong>16+</strong><span>Mini Games</span></div>
+            <div><strong>17+</strong><span>Mini Games</span></div>
             <div><strong>5</strong><span>Categories</span></div>
             <div><strong>Free</strong><span>Forever</span></div>
           </div>
@@ -112,6 +115,14 @@
           <button onclick="filterByCategory('sports')">Sports</button>
           <button onclick="filterByCategory('casual')">Casual</button>
         </div>
+      </section>
+
+      <section class="platform-bar">
+        <div><span>🪙</span><strong id="platformCoins">0</strong><small>Coins</small></div>
+        <div><span>⭐</span><strong id="platformXP">0</strong><small>XP</small></div>
+        <div><span>🎮</span><strong id="platformPlayed">0</strong><small>Games Played</small></div>
+        <div><span>❤️</span><strong id="platformFavorites">0</strong><small>Favourites</small></div>
+        <button onclick="claimDailyReward()" id="dailyRewardBtn">🎁 Claim Daily Reward</button>
       </section>
 
       <section class="section-block" id="trending">
@@ -187,12 +198,12 @@
             <span class="eyebrow">GAME LIBRARY</span>
             <h2>All Mini Games</h2>
           </div>
-          <span id="resultCount" class="result-count">16 Games</span>
+          <span id="resultCount" class="result-count">17 Games</span>
         </div>
 
         <div class="games-grid" id="gamesGrid">
           <article class="game-card" data-category="puzzle" data-name="tic tac toe strategy">
-            <div class="game-thumb thumb-red"><span>❌⭕</span><b>Strategy</b></div>
+            <div class="game-thumb thumb-red"><button class="favorite-toggle" onclick="event.stopPropagation();toggleFavoriteFromCard(this)" aria-label="Favourite">♡</button><span>❌⭕</span><b>Strategy</b></div>
             <div class="game-info">
               <div><h3>Tic-Tac-Toe</h3><p>Classic 3×3 strategy game.</p></div>
               <button onclick="openGame('tictactoe')">Play</button>
@@ -200,7 +211,7 @@
           </article>
 
           <article class="game-card" data-category="puzzle kids" data-name="memory match brain puzzle">
-            <div class="game-thumb thumb-purple"><span>🧠</span><b>Memory</b></div>
+            <div class="game-thumb thumb-purple"><button class="favorite-toggle" onclick="event.stopPropagation();toggleFavoriteFromCard(this)" aria-label="Favourite">♡</button><span>🧠</span><b>Memory</b></div>
             <div class="game-info">
               <div><h3>Memory Match</h3><p>Match all emoji pairs.</p></div>
               <button onclick="openGame('memory')">Play</button>
@@ -208,7 +219,7 @@
           </article>
 
           <article class="game-card" data-category="arcade casual" data-name="tap challenge speed">
-            <div class="game-thumb thumb-orange"><span>⚡</span><b>Speed</b></div>
+            <div class="game-thumb thumb-orange"><button class="favorite-toggle" onclick="event.stopPropagation();toggleFavoriteFromCard(this)" aria-label="Favourite">♡</button><span>⚡</span><b>Speed</b></div>
             <div class="game-info">
               <div><h3>Tap Challenge</h3><p>Test your tapping speed.</p></div>
               <button onclick="openGame('tap')">Play</button>
@@ -216,7 +227,7 @@
           </article>
 
           <article class="game-card" data-category="puzzle casual" data-name="number guess logic">
-            <div class="game-thumb thumb-green"><span>🔢</span><b>Logic</b></div>
+            <div class="game-thumb thumb-green"><button class="favorite-toggle" onclick="event.stopPropagation();toggleFavoriteFromCard(this)" aria-label="Favourite">♡</button><span>🔢</span><b>Logic</b></div>
             <div class="game-info">
               <div><h3>Number Guess</h3><p>Guess the hidden number.</p></div>
               <button onclick="openGame('guess')">Play</button>
@@ -224,7 +235,7 @@
           </article>
 
           <article class="game-card" data-category="arcade" data-name="snake arcade">
-            <div class="game-thumb thumb-blue"><span>🐍</span><b>Arcade</b></div>
+            <div class="game-thumb thumb-blue"><button class="favorite-toggle" onclick="event.stopPropagation();toggleFavoriteFromCard(this)" aria-label="Favourite">♡</button><span>🐍</span><b>Arcade</b></div>
             <div class="game-info">
               <div><h3>Snake Mini</h3><p>Eat food and grow longer.</p></div>
               <button onclick="openGame('snake')">Play</button>
@@ -232,7 +243,7 @@
           </article>
 
           <article class="game-card" data-category="sports kids" data-name="penalty kick football">
-            <div class="game-thumb thumb-cyan"><span>⚽</span><b>Sports</b></div>
+            <div class="game-thumb thumb-cyan"><button class="favorite-toggle" onclick="event.stopPropagation();toggleFavoriteFromCard(this)" aria-label="Favourite">♡</button><span>⚽</span><b>Sports</b></div>
             <div class="game-info">
               <div><h3>Penalty Kick</h3><p>Score as many goals as possible.</p></div>
               <button onclick="openGame('penalty')">Play</button>
@@ -240,7 +251,7 @@
           </article>
 
           <article class="game-card" data-category="casual kids" data-name="color catcher">
-            <div class="game-thumb thumb-pink"><span>🎨</span><b>Casual</b></div>
+            <div class="game-thumb thumb-pink"><button class="favorite-toggle" onclick="event.stopPropagation();toggleFavoriteFromCard(this)" aria-label="Favourite">♡</button><span>🎨</span><b>Casual</b></div>
             <div class="game-info">
               <div><h3>Color Catch</h3><p>Click the correct color.</p></div>
               <button onclick="openGame('color')">Play</button>
@@ -248,7 +259,7 @@
           </article>
 
           <article class="game-card" data-category="puzzle" data-name="quick math puzzle">
-            <div class="game-thumb thumb-yellow"><span>➕</span><b>Math</b></div>
+            <div class="game-thumb thumb-yellow"><button class="favorite-toggle" onclick="event.stopPropagation();toggleFavoriteFromCard(this)" aria-label="Favourite">♡</button><span>➕</span><b>Math</b></div>
             <div class="game-info">
               <div><h3>Quick Math</h3><p>Solve before time runs out.</p></div>
               <button onclick="openGame('math')">Play</button>
@@ -256,7 +267,7 @@
           </article>
 
           <article class="game-card" data-category="arcade casual" data-name="reaction test reflex">
-            <div class="game-thumb thumb-lime"><span>🟢</span><b>Reflex</b></div>
+            <div class="game-thumb thumb-lime"><button class="favorite-toggle" onclick="event.stopPropagation();toggleFavoriteFromCard(this)" aria-label="Favourite">♡</button><span>🟢</span><b>Reflex</b></div>
             <div class="game-info">
               <div><h3>Reaction Test</h3><p>Click only when the light turns green.</p></div>
               <button onclick="openGame('reaction')">Play</button>
@@ -264,7 +275,7 @@
           </article>
 
           <article class="game-card" data-category="sports casual" data-name="cricket timing bat">
-            <div class="game-thumb thumb-cricket"><span>🏏</span><b>Sports</b></div>
+            <div class="game-thumb thumb-cricket"><button class="favorite-toggle" onclick="event.stopPropagation();toggleFavoriteFromCard(this)" aria-label="Favourite">♡</button><span>🏏</span><b>Sports</b></div>
             <div class="game-info">
               <div><h3>Cricket Timing</h3><p>Hit the ball at the perfect moment.</p></div>
               <button onclick="openGame('cricket')">Play</button>
@@ -272,7 +283,7 @@
           </article>
 
           <article class="game-card" data-category="arcade sports" data-name="car racing highway">
-            <div class="game-thumb thumb-racing"><span>🏎️</span><b>Racing</b></div>
+            <div class="game-thumb thumb-racing"><button class="favorite-toggle" onclick="event.stopPropagation();toggleFavoriteFromCard(this)" aria-label="Favourite">♡</button><span>🏎️</span><b>Racing</b></div>
             <div class="game-info">
               <div><h3>Highway Racer</h3><p>Dodge traffic and survive.</p></div>
               <button onclick="openGame('racing')">Play</button>
@@ -280,7 +291,7 @@
           </article>
 
           <article class="game-card" data-category="arcade" data-name="brick breaker classic">
-            <div class="game-thumb thumb-brick"><span>🧱</span><b>Arcade</b></div>
+            <div class="game-thumb thumb-brick"><button class="favorite-toggle" onclick="event.stopPropagation();toggleFavoriteFromCard(this)" aria-label="Favourite">♡</button><span>🧱</span><b>Arcade</b></div>
             <div class="game-info">
               <div><h3>Brick Breaker</h3><p>Break all bricks with the ball.</p></div>
               <button onclick="openGame('brick')">Play</button>
@@ -288,7 +299,7 @@
           </article>
 
           <article class="game-card" data-category="arcade" data-name="space shooter alien">
-            <div class="game-thumb thumb-space"><span>🚀</span><b>Shooter</b></div>
+            <div class="game-thumb thumb-space"><button class="favorite-toggle" onclick="event.stopPropagation();toggleFavoriteFromCard(this)" aria-label="Favourite">♡</button><span>🚀</span><b>Shooter</b></div>
             <div class="game-info">
               <div><h3>Space Shooter</h3><p>Destroy enemy ships.</p></div>
               <button onclick="openGame('space')">Play</button>
@@ -296,7 +307,7 @@
           </article>
 
           <article class="game-card" data-category="casual arcade" data-name="flappy bird sky">
-            <div class="game-thumb thumb-flappy"><span>🐦</span><b>Casual</b></div>
+            <div class="game-thumb thumb-flappy"><button class="favorite-toggle" onclick="event.stopPropagation();toggleFavoriteFromCard(this)" aria-label="Favourite">♡</button><span>🐦</span><b>Casual</b></div>
             <div class="game-info">
               <div><h3>Sky Bird</h3><p>Fly through the pipes.</p></div>
               <button onclick="openGame('flappy')">Play</button>
@@ -304,7 +315,7 @@
           </article>
 
           <article class="game-card" data-category="sports casual" data-name="basketball shot">
-            <div class="game-thumb thumb-basket"><span>🏀</span><b>Sports</b></div>
+            <div class="game-thumb thumb-basket"><button class="favorite-toggle" onclick="event.stopPropagation();toggleFavoriteFromCard(this)" aria-label="Favourite">♡</button><span>🏀</span><b>Sports</b></div>
             <div class="game-info">
               <div><h3>Basket Shot</h3><p>Time your shot and score.</p></div>
               <button onclick="openGame('basket')">Play</button>
@@ -312,13 +323,36 @@
           </article>
 
           <article class="game-card" data-category="arcade casual" data-name="endless runner jump">
-            <div class="game-thumb thumb-runner"><span>🏃</span><b>Runner</b></div>
+            <div class="game-thumb thumb-runner"><button class="favorite-toggle" onclick="event.stopPropagation();toggleFavoriteFromCard(this)" aria-label="Favourite">♡</button><span>🏃</span><b>Runner</b></div>
             <div class="game-info">
               <div><h3>Endless Runner</h3><p>Jump over obstacles.</p></div>
               <button onclick="openGame('runner')">Play</button>
             </div>
           </article>
+
+          <article class="game-card" data-category="arcade casual" data-name="retro ball jump nokia bounce platform">
+            <div class="game-thumb thumb-retroball"><button class="favorite-toggle" onclick="event.stopPropagation();toggleFavoriteFromCard(this)" aria-label="Favourite">♡</button><span>🔴</span><b>Retro</b></div>
+            <div class="game-info">
+              <div><h3>Retro Ball Jump</h3><p>Classic phone-style jumping adventure.</p></div>
+              <button onclick="openGame('retroball')">Play</button>
+            </div>
+          </article>
         </div>
+      </section>
+
+
+      <section class="section-block smart-section" id="recentSection">
+        <div class="section-title">
+          <div><span class="eyebrow">CONTINUE PLAYING</span><h2>Recently Played</h2></div>
+        </div>
+        <div id="recentGames" class="smart-grid empty-smart">No games played yet.</div>
+      </section>
+
+      <section class="section-block smart-section" id="favoriteSection">
+        <div class="section-title">
+          <div><span class="eyebrow">YOUR COLLECTION</span><h2>Favourite Games</h2></div>
+        </div>
+        <div id="favoriteGames" class="smart-grid empty-smart">No favourite games yet.</div>
       </section>
 
       <section class="newsletter">
@@ -334,18 +368,37 @@
     <main id="gameScreen" class="hidden">
       <section class="game-page">
         <div class="game-page-header">
-          <button onclick="showHome()">← Back to Games</button>
-          <div>
+          <button class="back-game-button" onclick="showHome()">← Back to Games</button>
+          <div class="playing-title">
             <span class="eyebrow">NOW PLAYING</span>
             <h1 id="gameTitle">Game</h1>
+            <p id="gameInstruction">Use the controls shown below to play.</p>
           </div>
           <div class="toolbar-actions">
+            <button onclick="toggleFullscreen()">⛶ Fullscreen</button>
             <button onclick="toggleGamePause()">⏯ Pause</button>
             <button onclick="resetCurrentGame()">↻ Restart</button>
           </div>
         </div>
 
-        <div class="game-stage">
+        <div class="game-console-layout">
+          <aside class="game-side-panel">
+            <div class="side-card">
+              <span class="side-label">GAME</span>
+              <strong id="sideGameName">Mini Game</strong>
+            </div>
+            <div class="side-card">
+              <span class="side-label">CONTROLS</span>
+              <p id="sideGameControls">Keyboard controls</p>
+            </div>
+            <div class="side-card tips-card">
+              <span class="side-label">QUICK TIP</span>
+              <p id="sideGameTip">Stay focused and beat your best score.</p>
+            </div>
+            <button class="side-home-button" onclick="showHome()">Browse More Games</button>
+          </aside>
+
+          <div class="game-stage">
           <div id="pauseOverlay" class="pause-overlay hidden">
             <h2>Game Paused</h2>
             <p>Press Pause again to continue.</p>
@@ -542,6 +595,56 @@
             </div>
             <p class="status">Score: <b id="runnerScore">0</b> · Best: <b id="runnerBest">0</b></p>
           </div>
+
+          <div id="retroballGame" class="game-panel hidden">
+            <div class="premium-game-wrap retroball-wrap">
+              <canvas id="retroBallCanvas" width="700" height="450"></canvas>
+              <div id="retroBallOverlay" class="premium-overlay">
+                <h2>Retro Ball Jump</h2>
+                <p>Move with ← → · Jump with Space</p>
+                <button onclick="startRetroBall()">Start Adventure</button>
+              </div>
+            </div>
+            <div class="game-hud">
+              <span>Level: <b id="retroBallLevel">1</b></span>
+              <span>Rings: <b id="retroBallRings">0</b></span>
+              <span>Lives: <b id="retroBallLives">3</b></span>
+              <span>Best: <b id="retroBallBest">0</b></span>
+            </div>
+          </div>
+        </div>
+        </div>
+      </section>
+    </main>
+
+
+    <main id="profileScreen" class="hidden">
+      <section class="profile-page">
+        <div class="game-page-header">
+          <button onclick="showHome()">← Back Home</button>
+          <div><span class="eyebrow">PLAYER HUB</span><h1>My Profile</h1></div>
+          <button onclick="editPlayerName()">✎ Edit Name</button>
+        </div>
+
+        <div class="profile-grid">
+          <div class="profile-main-card">
+            <div class="profile-big-avatar" id="profileAvatar">G</div>
+            <h2 id="profilePlayerName">Guest Player</h2>
+            <p id="profileLevelText">Level 1</p>
+            <div class="xp-track"><span id="xpFill"></span></div>
+            <small id="xpProgress">0 / 100 XP</small>
+          </div>
+
+          <div class="profile-stat-card"><span>🪙</span><strong id="profileCoins">0</strong><small>Total Coins</small></div>
+          <div class="profile-stat-card"><span>🎮</span><strong id="profilePlayed">0</strong><small>Games Played</small></div>
+          <div class="profile-stat-card"><span>🏆</span><strong id="profileScore">0</strong><small>Total Score</small></div>
+
+          <div class="achievement-panel">
+            <div class="section-title">
+              <div><span class="eyebrow">PROGRESS</span><h2>Achievements</h2></div>
+            </div>
+            <div id="achievementGrid" class="achievement-grid"></div>
+          </div>
         </div>
       </section>
     </main>
@@ -574,6 +677,7 @@
             <div><span>Sky Bird Best</span><b id="scoreFlappy">0</b></div>
             <div><span>Basket Score</span><b id="scoreBasket">0</b></div>
             <div><span>Runner Best</span><b id="scoreRunner">0</b></div>
+            <div><span>Retro Ball Best</span><b id="scoreRetroball">0</b></div>
           </div>
         </div>
       </section>
