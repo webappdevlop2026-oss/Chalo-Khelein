@@ -1,22 +1,17 @@
-# Chalo Khelein Desktop Website
+# Chalo Khelein Desktop Website V2
 
-Desktop-first online mini game website.
+Improved desktop-first mini game website.
 
-Included playable games:
-- Tic-Tac-Toe
-- Memory Match
-- Tap Challenge
-- Number Guess
-- Snake Mini
-- Penalty Kick
-- Color Catch
-- Quick Math
+Playable games:
+1. Tic-Tac-Toe with smarter AI
+2. Memory Match
+3. Tap Challenge
+4. Number Guess
+5. Snake Mini with start, pause, grid and game-over
+6. Penalty Kick
+7. Color Catch
+8. Quick Math
+9. Reaction Test
+10. Cricket Timing
 
 Open index.html in Chrome or Edge.
-
-Files:
-- index.html
-- style.css
-- script.js
-
-No backend is required. Scores are saved in the browser using Local Storage.

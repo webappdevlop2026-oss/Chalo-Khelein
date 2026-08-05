@@ -7,26 +7,29 @@ const screens = {
 const gameNames = {
   tictactoe:"Tic-Tac-Toe", memory:"Memory Match", tap:"Tap Challenge",
   guess:"Number Guess", snake:"Snake Mini", penalty:"Penalty Kick",
-  color:"Color Catch", math:"Quick Math"
+  color:"Color Catch", math:"Quick Math", reaction:"Reaction Test", cricket:"Cricket Timing"
 };
 
 let currentGame = null;
 let activeCategory = "all";
-let scores = JSON.parse(localStorage.getItem("chaloKheleinScores") || '{"ttt":0,"memory":0,"tap":0,"guess":0,"snake":0,"penalty":0,"color":0,"math":0}');
+let scores = JSON.parse(localStorage.getItem("chaloKheleinScores") || '{"ttt":0,"memory":0,"tap":0,"guess":0,"snake":0,"penalty":0,"color":0,"math":0,"reaction":0,"cricket":0}');
+if(scores.reaction===undefined)scores.reaction=0;if(scores.cricket===undefined)scores.cricket=0;
 
 function saveScores(){
   localStorage.setItem("chaloKheleinScores",JSON.stringify(scores));
   updateScoreUI();
 }
 function totalScore(){
-  return scores.ttt*100 + scores.memory*150 + scores.tap + scores.guess*120 + scores.snake*10 + scores.penalty*15 + scores.color*10 + scores.math*10;
+  return scores.ttt*100 + scores.memory*150 + scores.tap + scores.guess*120 + scores.snake*10 + scores.penalty*15 + scores.color*10 + scores.math*10 + scores.cricket*10;
 }
 function updateScoreUI(){
   document.getElementById("scoreBoardTotal").textContent=totalScore();
-  ["ttt","memory","tap","guess","snake","penalty","color","math"].forEach(k=>{
+  ["ttt","memory","tap","guess","snake","penalty","color","math","cricket"].forEach(k=>{
     const id="score"+k.charAt(0).toUpperCase()+k.slice(1);
-    document.getElementById(id).textContent=scores[k]||0;
+    const el=document.getElementById(id); if(el) el.textContent=scores[k]||0;
   });
+  const r=document.getElementById("scoreReaction");
+  if(r) r.textContent=scores.reaction? scores.reaction+" ms":"--";
 }
 function switchScreen(name){
   Object.values(screens).forEach(s=>s.classList.add("hidden"));
@@ -37,7 +40,7 @@ function showHome(){ stopRunningGames(); currentGame=null; switchScreen("home");
 function showScoreBoard(){ updateScoreUI(); switchScreen("score"); }
 function clearScores(){
   if(!confirm("Clear all saved scores?")) return;
-  scores={ttt:0,memory:0,tap:0,guess:0,snake:0,penalty:0,color:0,math:0};
+  scores={ttt:0,memory:0,tap:0,guess:0,snake:0,penalty:0,color:0,math:0,reaction:0,cricket:0};
   saveScores();
 }
 function openGame(name){
@@ -58,9 +61,11 @@ function resetCurrentGame(){
   if(currentGame==="penalty") resetPenalty();
   if(currentGame==="color") resetColor();
   if(currentGame==="math") resetMath();
+  if(currentGame==="reaction") resetReaction();
+  if(currentGame==="cricket") resetCricket();
 }
 function stopRunningGames(){
-  clearInterval(tapTimer); clearInterval(snakeTimer); clearInterval(mathTimer);
+  clearInterval(tapTimer); clearInterval(snakeTimer); clearInterval(mathTimer); clearTimeout(reactionTimer); cancelAnimationFrame(cricketAnim);
 }
 function filterGames(){
   const q=document.getElementById("gameSearch").value.toLowerCase().trim();
@@ -102,11 +107,25 @@ function playTtt(i){
 }
 function computerMove(){
   const open=ttt.map((v,i)=>v?null:i).filter(v=>v!==null);
-  const i=open[Math.floor(Math.random()*open.length)];
-  if(i!==undefined) ttt[i]="O"; renderTtt();
+  let i=findCriticalMove("O");
+  if(i===null)i=findCriticalMove("X");
+  if(i===null&&ttt[4]==="")i=4;
+  if(i===null){
+    const corners=[0,2,6,8].filter(x=>ttt[x]==="");
+    i=corners.length?corners[Math.floor(Math.random()*corners.length)]:open[Math.floor(Math.random()*open.length)];
+  }
+  if(i!==undefined&&i!==null) ttt[i]="O"; renderTtt();
   if(checkWinner("O")){document.getElementById("tttStatus").textContent="Computer won.";computerWins++;updateTttStats();tttLocked=true;return;}
   if(ttt.every(Boolean)){document.getElementById("tttStatus").textContent="Draw!";tttLocked=true;return;}
   tttLocked=false;document.getElementById("tttStatus").textContent="Your turn: X";
+}
+function findCriticalMove(mark){
+  const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  for(const line of lines){
+    const vals=line.map(i=>ttt[i]);
+    if(vals.filter(v=>v===mark).length===2 && vals.includes("")) return line[vals.indexOf("")];
+  }
+  return null;
 }
 function checkWinner(m){return [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]].some(l=>l.every(i=>ttt[i]===m));}
 function updateTttStats(){document.getElementById("playerWins").textContent=playerWins;document.getElementById("computerWins").textContent=computerWins;}
@@ -165,28 +184,52 @@ function submitGuess(){
 document.getElementById("guessInput").addEventListener("keydown",e=>{if(e.key==="Enter")submitGuess();});
 
 /* Snake */
-let snakeTimer=null,snake=[],snakeFood={x:5,y:5},snakeDir={x:1,y:0},snakeScore=0;
+let snakeTimer=null,snake=[],snakeFood={x:5,y:5},snakeDir={x:1,y:0},nextSnakeDir={x:1,y:0},snakeScore=0,snakeRunning=false,snakePaused=false;
 const snakeCanvas=document.getElementById("snakeCanvas"),ctx=snakeCanvas.getContext("2d"),cell=24;
 function resetSnake(){
-  clearInterval(snakeTimer);snake=[{x:10,y:10},{x:9,y:10},{x:8,y:10}];snakeDir={x:1,y:0};snakeScore=0;placeFood();drawSnake();
-  document.getElementById("snakeScore").textContent=0;snakeTimer=setInterval(snakeStep,130);
+  clearInterval(snakeTimer);snake=[{x:10,y:10},{x:9,y:10},{x:8,y:10}];snakeDir={x:1,y:0};nextSnakeDir={x:1,y:0};
+  snakeScore=0;snakeRunning=false;snakePaused=false;placeFood();drawSnake();
+  document.getElementById("snakeScore").textContent=0;document.getElementById("snakeBest").textContent=scores.snake||0;
+  document.getElementById("snakePauseBtn").textContent="Pause";
+  const o=document.getElementById("snakeOverlay");o.classList.remove("hidden");o.querySelector("strong").textContent="Snake Mini";o.querySelector("span").textContent="Use Arrow Keys";o.querySelector("button").textContent="Start Game";
 }
-function placeFood(){snakeFood={x:Math.floor(Math.random()*20),y:Math.floor(Math.random()*20)};}
+function startSnake(){
+  clearInterval(snakeTimer);snakeRunning=true;snakePaused=false;document.getElementById("snakeOverlay").classList.add("hidden");
+  snakeTimer=setInterval(snakeStep,115);
+}
+function toggleSnakePause(){
+  if(!snakeRunning)return;
+  snakePaused=!snakePaused;document.getElementById("snakePauseBtn").textContent=snakePaused?"Resume":"Pause";
+}
+function placeFood(){
+  do{snakeFood={x:Math.floor(Math.random()*20),y:Math.floor(Math.random()*20)}}while(snake.some(s=>s.x===snakeFood.x&&s.y===snakeFood.y));
+}
 function snakeStep(){
+  if(snakePaused)return;
+  snakeDir=nextSnakeDir;
   const head={x:snake[0].x+snakeDir.x,y:snake[0].y+snakeDir.y};
-  if(head.x<0||head.y<0||head.x>=20||head.y>=20||snake.some(s=>s.x===head.x&&s.y===head.y)){clearInterval(snakeTimer);if(snakeScore>scores.snake){scores.snake=snakeScore;saveScores();}return;}
+  if(head.x<0||head.y<0||head.x>=20||head.y>=20||snake.some(s=>s.x===head.x&&s.y===head.y)){
+    clearInterval(snakeTimer);snakeRunning=false;
+    if(snakeScore>scores.snake){scores.snake=snakeScore;saveScores();}
+    const o=document.getElementById("snakeOverlay");o.classList.remove("hidden");o.querySelector("strong").textContent="Game Over";o.querySelector("span").textContent="Score: "+snakeScore;o.querySelector("button").textContent="Play Again";return;
+  }
   snake.unshift(head);
-  if(head.x===snakeFood.x&&head.y===snakeFood.y){snakeScore++;document.getElementById("snakeScore").textContent=snakeScore;placeFood();}else snake.pop();
+  if(head.x===snakeFood.x&&head.y===snakeFood.y){snakeScore++;document.getElementById("snakeScore").textContent=snakeScore;placeFood();}
+  else snake.pop();
   drawSnake();
 }
 function drawSnake(){
-  ctx.clearRect(0,0,480,480);ctx.fillStyle="#ff5d7c";ctx.fillRect(snakeFood.x*cell+3,snakeFood.y*cell+3,cell-6,cell-6);
-  ctx.fillStyle="#6ee7b7";snake.forEach((s,i)=>ctx.fillRect(s.x*cell+2,s.y*cell+2,cell-4,cell-4));
+  ctx.clearRect(0,0,480,480);
+  ctx.fillStyle="#11182c";ctx.fillRect(0,0,480,480);
+  ctx.strokeStyle="rgba(255,255,255,.035)";
+  for(let i=0;i<=20;i++){ctx.beginPath();ctx.moveTo(i*cell,0);ctx.lineTo(i*cell,480);ctx.stroke();ctx.beginPath();ctx.moveTo(0,i*cell);ctx.lineTo(480,i*cell);ctx.stroke();}
+  ctx.fillStyle="#ff5d7c";ctx.beginPath();ctx.arc(snakeFood.x*cell+12,snakeFood.y*cell+12,9,0,Math.PI*2);ctx.fill();
+  snake.forEach((s,i)=>{ctx.fillStyle=i===0?"#34d399":"#6ee7b7";ctx.fillRect(s.x*cell+2,s.y*cell+2,cell-4,cell-4);});
 }
 document.addEventListener("keydown",e=>{
   if(currentGame!=="snake")return;
   const map={ArrowUp:{x:0,y:-1},ArrowDown:{x:0,y:1},ArrowLeft:{x:-1,y:0},ArrowRight:{x:1,y:0}};
-  if(map[e.key]&&!(map[e.key].x===-snakeDir.x&&map[e.key].y===-snakeDir.y))snakeDir=map[e.key];
+  if(map[e.key]&&!(map[e.key].x===-snakeDir.x&&map[e.key].y===-snakeDir.y)){nextSnakeDir=map[e.key];e.preventDefault();}
 });
 
 /* Penalty */
@@ -226,3 +269,86 @@ document.getElementById("mathInput").addEventListener("keydown",e=>{if(e.key==="
 
 updateScoreUI();
 renderTtt();
+
+
+/* Reaction Test */
+let reactionTimer=null,reactionStartedAt=0,reactionState="idle";
+function resetReaction(){
+  clearTimeout(reactionTimer);reactionState="idle";
+  const pad=document.getElementById("reactionPad");pad.className="reaction-pad waiting";
+  document.getElementById("reactionText").textContent="Click Start";
+  document.getElementById("reactionSubtext").textContent="Wait for green before clicking.";
+  document.getElementById("reactionBest").textContent=scores.reaction?scores.reaction+" ms":"--";
+}
+function startReaction(){
+  clearTimeout(reactionTimer);reactionState="waiting";
+  const pad=document.getElementById("reactionPad");pad.className="reaction-pad waiting";
+  document.getElementById("reactionText").textContent="Wait...";
+  document.getElementById("reactionSubtext").textContent="Do not click yet.";
+  reactionTimer=setTimeout(()=>{
+    reactionState="ready";reactionStartedAt=performance.now();pad.className="reaction-pad ready";
+    document.getElementById("reactionText").textContent="CLICK!";
+    document.getElementById("reactionSubtext").textContent="Now!";
+  },1500+Math.random()*2500);
+}
+function reactionClick(){
+  const pad=document.getElementById("reactionPad");
+  if(reactionState==="waiting"){
+    clearTimeout(reactionTimer);reactionState="idle";pad.className="reaction-pad too-soon";
+    document.getElementById("reactionText").textContent="Too Soon!";
+    document.getElementById("reactionSubtext").textContent="Press Start and try again.";
+  }else if(reactionState==="ready"){
+    const ms=Math.round(performance.now()-reactionStartedAt);reactionState="idle";pad.className="reaction-pad waiting";
+    document.getElementById("reactionText").textContent=ms+" ms";
+    document.getElementById("reactionSubtext").textContent=ms<250?"Excellent reflex!":ms<350?"Good reaction!":"Keep practicing.";
+    if(!scores.reaction||ms<scores.reaction){scores.reaction=ms;saveScores();}
+    document.getElementById("reactionBest").textContent=scores.reaction+" ms";
+  }
+}
+
+/* Cricket Timing */
+let cricketAnim=0,cricketX=0,cricketRuns=0,cricketBalls=0,cricketActive=false,batSwinging=false;
+function resetCricket(){
+  cancelAnimationFrame(cricketAnim);cricketRuns=0;cricketBalls=0;cricketActive=false;batSwinging=false;
+  document.getElementById("cricketRuns").textContent=0;document.getElementById("cricketBalls").textContent="0/12";
+  document.getElementById("cricketMessage").textContent="Press SWING BAT to start.";
+  const ball=document.getElementById("cricketBall");ball.style.left="6%";ball.style.bottom="80px";
+}
+function startCricketBall(){
+  if(cricketBalls>=12){document.getElementById("cricketMessage").textContent="Innings complete! Final score: "+cricketRuns;return;}
+  cricketActive=true;batSwinging=false;cricketX=6;
+  const ball=document.getElementById("cricketBall");
+  function frame(){
+    cricketX+=0.65;ball.style.left=cricketX+"%";
+    ball.style.bottom=(80+Math.sin(cricketX/8)*18)+"px";
+    if(cricketX>=84){
+      cricketBalls++;document.getElementById("cricketBalls").textContent=cricketBalls+"/12";
+      cricketActive=false;document.getElementById("cricketMessage").textContent="Missed! Swing earlier.";
+      setTimeout(startCricketBall,700);return;
+    }
+    cricketAnim=requestAnimationFrame(frame);
+  }
+  frame();
+}
+function swingBat(){
+  const bat=document.getElementById("cricketBat");
+  bat.style.transform="rotate(35deg)";setTimeout(()=>bat.style.transform="rotate(-18deg)",180);
+  if(!cricketActive){startCricketBall();return;}
+  if(batSwinging)return;batSwinging=true;
+  let runs=0;
+  if(cricketX>=72&&cricketX<=79)runs=6;
+  else if(cricketX>=66&&cricketX<72)runs=4;
+  else if(cricketX>=60&&cricketX<66)runs=2;
+  else if(cricketX>=55&&cricketX<60)runs=1;
+  if(runs>0){
+    cancelAnimationFrame(cricketAnim);cricketActive=false;cricketRuns+=runs;cricketBalls++;
+    document.getElementById("cricketRuns").textContent=cricketRuns;
+    document.getElementById("cricketBalls").textContent=cricketBalls+"/12";
+    document.getElementById("cricketMessage").textContent=runs===6?"SIX! Perfect timing!":runs===4?"FOUR! Great shot!":runs+" run"+(runs>1?"s":"")+"!";
+    if(cricketRuns>scores.cricket){scores.cricket=cricketRuns;saveScores();}
+    setTimeout(startCricketBall,850);
+  }else{
+    document.getElementById("cricketMessage").textContent="Too early! Watch the ball.";
+    setTimeout(()=>batSwinging=false,200);
+  }
+}

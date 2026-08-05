@@ -48,7 +48,7 @@
             <a class="secondary-button" href="#allGames">Explore All Games</a>
           </div>
           <div class="hero-stats">
-            <div><strong>8+</strong><span>Mini Games</span></div>
+            <div><strong>10+</strong><span>Mini Games</span></div>
             <div><strong>5</strong><span>Categories</span></div>
             <div><strong>Free</strong><span>Forever</span></div>
           </div>
@@ -158,7 +158,7 @@
             <span class="eyebrow">GAME LIBRARY</span>
             <h2>All Mini Games</h2>
           </div>
-          <span id="resultCount" class="result-count">8 Games</span>
+          <span id="resultCount" class="result-count">10 Games</span>
         </div>
 
         <div class="games-grid" id="gamesGrid">
@@ -225,6 +225,22 @@
               <button onclick="openGame('math')">Play</button>
             </div>
           </article>
+
+          <article class="game-card" data-category="arcade casual" data-name="reaction test reflex">
+            <div class="game-thumb thumb-lime"><span>🟢</span><b>Reflex</b></div>
+            <div class="game-info">
+              <div><h3>Reaction Test</h3><p>Click only when the light turns green.</p></div>
+              <button onclick="openGame('reaction')">Play</button>
+            </div>
+          </article>
+
+          <article class="game-card" data-category="sports casual" data-name="cricket timing bat">
+            <div class="game-thumb thumb-cricket"><span>🏏</span><b>Sports</b></div>
+            <div class="game-info">
+              <div><h3>Cricket Timing</h3><p>Hit the ball at the perfect moment.</p></div>
+              <button onclick="openGame('cricket')">Play</button>
+            </div>
+          </article>
         </div>
       </section>
 
@@ -285,8 +301,19 @@
           </div>
 
           <div id="snakeGame" class="game-panel hidden">
-            <div class="canvas-wrap"><canvas id="snakeCanvas" width="480" height="480"></canvas></div>
-            <p class="status">Use Arrow Keys · Score: <b id="snakeScore">0</b></p>
+            <div class="canvas-wrap snake-wrap">
+              <canvas id="snakeCanvas" width="480" height="480"></canvas>
+              <div id="snakeOverlay" class="game-overlay">
+                <strong>Snake Mini</strong>
+                <span>Use Arrow Keys</span>
+                <button onclick="startSnake()">Start Game</button>
+              </div>
+            </div>
+            <div class="snake-controls">
+              <button onclick="toggleSnakePause()" id="snakePauseBtn">Pause</button>
+              <span>Score: <b id="snakeScore">0</b></span>
+              <span>Best: <b id="snakeBest">0</b></span>
+            </div>
           </div>
 
           <div id="penaltyGame" class="game-panel hidden">
@@ -322,6 +349,32 @@
               <p id="mathMessage" class="status">Solve as many as you can.</p>
             </div>
           </div>
+
+          <div id="reactionGame" class="game-panel hidden">
+            <div class="reaction-game">
+              <div id="reactionPad" class="reaction-pad waiting" onclick="reactionClick()">
+                <strong id="reactionText">Click Start</strong>
+                <span id="reactionSubtext">Wait for green before clicking.</span>
+              </div>
+              <button class="panel-action" onclick="startReaction()">Start Reaction Test</button>
+              <p class="status">Best Time: <b id="reactionBest">--</b></p>
+            </div>
+          </div>
+
+          <div id="cricketGame" class="game-panel hidden">
+            <div class="cricket-ground">
+              <div class="pitch-line"></div>
+              <div class="wicket">|||</div>
+              <div id="cricketBall" class="cricket-ball">🔴</div>
+              <div id="cricketBat" class="cricket-bat">🏏</div>
+            </div>
+            <button class="panel-action" onclick="swingBat()">SWING BAT</button>
+            <p id="cricketMessage" class="status">Press Start to begin.</p>
+            <div class="mini-stats">
+              <span>Runs: <b id="cricketRuns">0</b></span>
+              <span>Balls: <b id="cricketBalls">0</b>/12</span>
+            </div>
+          </div>
         </div>
       </section>
     </main>
@@ -346,6 +399,8 @@
             <div><span>Penalty Goals</span><b id="scorePenalty">0</b></div>
             <div><span>Color Catch Best</span><b id="scoreColor">0</b></div>
             <div><span>Quick Math Best</span><b id="scoreMath">0</b></div>
+            <div><span>Reaction Best</span><b id="scoreReaction">--</b></div>
+            <div><span>Cricket Best Runs</span><b id="scoreCricket">0</b></div>
           </div>
         </div>
       </section>
